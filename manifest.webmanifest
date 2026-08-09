@@ -1,0 +1,33 @@
+{
+  "name": "איטליה 2026 — רומא · סורנטו · נאפולי",
+  "short_name": "איטליה 2026",
+  "description": "מסלול הטיול לאיטליה — רומא, סורנטו ונאפולי.",
+  "lang": "he",
+  "dir": "rtl",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F6EEDC",
+  "theme_color": "#C1502E",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
