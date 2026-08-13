@@ -332,9 +332,10 @@
 
         /* ---------- TOP NAVIGATION ---------- */
         .top-nav{
-            display:flex;
+            display:grid;
+            grid-template-columns:repeat(4, minmax(0, 150px));
             justify-content:center;
-            gap:1rem;
+            gap:.6rem .8rem;
             padding:1rem 1.5rem;
             background:var(--paper-deep);
             border-bottom:1px solid var(--line);
@@ -343,6 +344,7 @@
             z-index:100;
         }
         .top-nav-tab{
+            width:100%;
             padding:.5rem 1rem;
             background:transparent;
             border:2px solid var(--line);
@@ -352,6 +354,8 @@
             font-weight:700;
             cursor:pointer;
             transition:all .2s ease;
+            white-space:nowrap;
+            text-align:center;
         }
         .top-nav-tab:hover{
             background:var(--lemon);
@@ -365,19 +369,16 @@
         }
         @media (max-width:560px){
             .top-nav{
-                gap:.3rem;
+                grid-template-columns:repeat(4, 1fr);
+                gap:.4rem;
                 padding:.7rem .35rem;
                 justify-content:stretch;
             }
             .top-nav-tab{
-                flex:1 1 0;
-                min-width:0;
                 padding:.45rem .15rem;
                 font-size:clamp(.6rem, 3.1vw, .82rem);
                 border-width:1.5px;
                 border-radius:5px;
-                white-space:nowrap;
-                text-align:center;
             }
         }
         .main-panel{
@@ -1668,17 +1669,7 @@
 <div class="main-panel" data-panel="hotels">
     <section class="extras-section">
         <div class="sub-content active">
-            <p class="extras-summary">עלויות מלונות<span class="total">סה״כ מלונות לכל אחת — ₪2,929 לכל התקופה</span></p>
-            <div class="plan-info">
-                <ul>
-                    <li><strong>בנגקוק · ₪571</strong><span class="pi-note">The Mandison Bangkok (Formerly Golden Tulip Mandison Suites) · <a class="maplink" href="https://maps.app.goo.gl/QesjsCNurWdVgFBe6" target="_blank" rel="noopener">מפה ↗</a></span></li>
-                    <li><strong>קו טאו · ₪832</strong><span class="pi-note">The Tarna Resort, Ko Tao · <a class="maplink" href="https://maps.app.goo.gl/fkLC2G8c2aEKret6A" target="_blank" rel="noopener">מפה ↗</a></span></li>
-                    <li><strong>קוסמוי · ₪901 + 89</strong><span class="pi-note">The Culture Samui · <a class="maplink" href="https://maps.app.goo.gl/nXgkARVogkTDQtG89" target="_blank" rel="noopener">מפה ↗</a> · Nora LakeView · <a class="maplink" href="https://maps.app.goo.gl/eeY1TZ1JqwphLvvi6" target="_blank" rel="noopener">מפה ↗</a></span></li>
-                    <li><strong>צ׳יאנג מאי · ₪884</strong><span class="pi-note">THEE Vijit Lanna by TH District · <a class="maplink" href="https://maps.app.goo.gl/t7E7StM6EHTBawdDA" target="_blank" rel="noopener">מפה ↗</a></span></li>
-                    <li><strong>הונג קונג · ₪1,381</strong><span class="pi-note">Urbanwood Ap Lei Chau · <a class="maplink" href="https://maps.app.goo.gl/RNi8qxzmz9NSoXJB6" target="_blank" rel="noopener">מפה ↗</a></span></li>
-                    <li><strong>קאו לאק · ₪1,200</strong><span class="pi-note">La Solaya Khao Lak · <a class="maplink" href="https://maps.app.goo.gl/oTwvgkXKBBaqzFjp6" target="_blank" rel="noopener">מפה ↗</a></span></li>
-                </ul>
-            </div>
+            <p class="extras-summary">עלויות מלונות<span class="total">סה״כ מלונות — ₪<span id="hotelsTotal">0</span></span></p>
             <div class="item-list" data-list-key="hotels"></div>
             <div class="add-form" data-list-target="hotels" data-fields="name,city,note,price">
                 <input class="add-input" type="text" data-field="name" placeholder="שם המלון">
@@ -1705,15 +1696,6 @@
     <section class="extras-section">
         <div class="sub-content active">
             <p class="extras-summary">עלויות טיסות<span class="total">סה״כ טיסות — ₪<span id="flightsTotal">0</span></span></p>
-            <div class="plan-info">
-                <ul>
-                    <li><strong>ישראל — הלוך חזור · ₪3,857</strong><span class="pi-note">לכל אחת</span></li>
-                    <li><strong>בנגקוק → קוסמוי</strong><span class="pi-note">—</span></li>
-                    <li><strong>קוסמוי → צ׳יאנג מאי</strong><span class="pi-note">—</span></li>
-                    <li><strong>צ׳יאנג מאי → הונג קונג</strong><span class="pi-note">—</span></li>
-                    <li><strong>הונג קונג → פוקט</strong><span class="pi-note">—</span></li>
-                </ul>
-            </div>
             <div class="item-list" data-list-key="flights"></div>
             <div class="add-form" data-list-target="flights" data-fields="name,note,price">
                 <input class="add-input" type="text" data-field="name" placeholder="מסלול הטיסה">

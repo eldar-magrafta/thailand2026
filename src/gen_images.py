@@ -55,7 +55,7 @@ def make_preview(path):
     d = ImageDraw.Draw(img)
 
     # centred translucent card
-    cw, ch = 780, 470
+    cw, ch = 780, 512
     cx, cy = (W - cw) // 2, (H - ch) // 2
     card = Image.new("RGBA", (cw, ch), (0, 0, 0, 0))
     cd = ImageDraw.Draw(card)
@@ -67,40 +67,67 @@ def make_preview(path):
     midx = W // 2
     # top small-caps latin
     f_top = font(SERIF, 40)
-    d.text((midx, cy + 78), "T H A I L A N D  ·  2 0 2 6", font=f_top,
+    d.text((midx, cy + 72), "T H A I L A N D  ·  2 0 2 6", font=f_top,
            fill=LEMON, anchor="mm")
     # big Hebrew title
     f_title = font(FRANK, 165)
-    d.text((midx, cy + 195), he("תאילנד"), font=f_title, fill=PAPER, anchor="mm")
-    # subtitle Hebrew
-    f_sub = font(DAVID, 40)
-    d.text((midx, cy + 300), he("מקדשים, איים וכרך — שלושה שבועות במזרח"),
-           font=f_sub, fill=(246, 238, 220), anchor="mm")
+    d.text((midx, cy + 188), he("תאילנד"), font=f_title, fill=PAPER, anchor="mm")
+    # subtitle Hebrew (auto-shrink to fit the card width)
+    sub_txt = he("החופשה המושלמת מתחילה כעת חיה בוקובזה")
+    sub_sz = 42
+    while sub_sz > 20:
+        f_sub = font(DAVID, sub_sz)
+        b = d.textbbox((0, 0), sub_txt, font=f_sub)
+        if (b[2] - b[0]) <= cw - 90:
+            break
+        sub_sz -= 1
+    d.text((midx, cy + 282), sub_txt, font=f_sub, fill=(246, 238, 220), anchor="mm")
 
-    # city chips
-    chips = ["Bangkok", "Ko Samui", "Chiang Mai"]
-    f_chip = font(SERIF, 34)
-    gap = 26
-    padx = 26
-    sizes = [d.textbbox((0, 0), c, font=f_chip) for c in chips]
-    widths = [(b[2] - b[0]) + padx * 2 for b in sizes]
-    star_w = 44
-    total = sum(widths) + star_w * (len(chips) - 1) + gap * 2 * (len(chips) - 1)
-    x = midx - total / 2
-    chy = cy + 400
-    ch_h = 60
-    for i, c in enumerate(chips):
-        cwd = widths[i]
-        d.rounded_rectangle([x, chy - ch_h / 2, x + cwd, chy + ch_h / 2],
-                            radius=ch_h / 2, outline=(246, 238, 220, 160), width=2)
-        d.text((x + cwd / 2, chy), c, font=f_chip, fill=PAPER, anchor="mm")
-        x += cwd
-        if i < len(chips) - 1:
-            x += gap
-            # small gold diamond separator
-            sx, sy, s = x + star_w / 2, chy, 9
-            d.polygon([(sx, sy - s), (sx + s, sy), (sx, sy + s), (sx - s, sy)], fill=LEMON)
-            x += star_w + gap
+    # city chips — every destination on the itinerary (Israel excluded)
+    chips = ["Bangkok", "Ko Tao", "Ko Samui", "Chiang Mai",
+             "Hong Kong", "Macau", "Khao Lak"]
+    f_chip = font(SERIF, 28)
+    padx = 20
+    gap = 14          # space between a chip and the diamond
+    star_w = 18       # diamond slot width
+    ch_h = 48
+    row_gap = 15
+    max_w = cw - 56   # usable width inside the card
+    # uniform chip width so equal-count rows share the same column geometry
+    # (this makes the diamond separators line up vertically across rows)
+    raw = [(d.textbbox((0, 0), c, font=f_chip)[2] - d.textbbox((0, 0), c, font=f_chip)[0]) + padx * 2 for c in chips]
+    uw = max(raw)
+    widths = [uw] * len(chips)
+
+    # greedily wrap chips into rows that fit max_w
+    rows, cur, cur_w = [], [], 0
+    for c, w in zip(chips, widths):
+        add = w + (gap * 2 + star_w if cur else 0)
+        if cur and cur_w + add > max_w:
+            rows.append(cur); cur, cur_w = [], 0
+            add = w
+        cur.append((c, w)); cur_w += add
+    if cur:
+        rows.append(cur)
+
+    total_h = len(rows) * ch_h + (len(rows) - 1) * row_gap
+    # centre the chip block in the space between the subtitle and the card bottom
+    region_c = (cy + 318 + cy + ch - 28) / 2
+    chy = region_c - total_h / 2 + ch_h / 2
+    for row in rows:
+        row_w = sum(w for _, w in row) + (len(row) - 1) * (gap * 2 + star_w)
+        x = midx - row_w / 2
+        for j, (c, w) in enumerate(row):
+            d.rounded_rectangle([x, chy - ch_h / 2, x + w, chy + ch_h / 2],
+                                radius=ch_h / 2, outline=(246, 238, 220, 160), width=2)
+            d.text((x + w / 2, chy), c, font=f_chip, fill=PAPER, anchor="mm")
+            x += w
+            if j < len(row) - 1:
+                x += gap
+                sx, sy, s = x + star_w / 2, chy, 8
+                d.polygon([(sx, sy - s), (sx + s, sy), (sx, sy + s), (sx - s, sy)], fill=LEMON)
+                x += star_w + gap
+        chy += ch_h + row_gap
 
     img.convert("RGB").save(path, "JPEG", quality=90)
     print("wrote", path)
