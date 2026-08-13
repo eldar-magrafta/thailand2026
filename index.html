@@ -116,10 +116,11 @@
             font-family:'Frank Ruhl Libre', serif; font-weight:900;
             font-size:clamp(1.8rem, 5vw, 2.8rem); margin:0 0 1.1rem; line-height:1;
         }
-        .cal-scroll{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+        /* no horizontal scroll — the grid always fits the screen width */
+        .cal-scroll{ overflow:visible; }
         .cal-grid{
             display:grid; grid-template-columns:repeat(7, 1fr); gap:.4rem;
-            min-width:640px;
+            min-width:0;
         }
         .cal-dow{
             font-family:'Fraunces', serif; font-weight:600; font-size:.82rem;
@@ -1263,10 +1264,25 @@
         }
 
         @media (max-width:560px){
-            .hero{ padding:3rem .8rem 2.6rem; }
-            .hero-cal{ padding:1.4rem 1rem 1.6rem; }
-            .cal-cell{ min-height:62px; padding:.4rem .45rem; }
-            .cal-place{ font-size:.8rem; }
+            .hero{ padding:3rem .6rem 2.6rem; }
+            .hero-cal{ padding:1.4rem .6rem 1.6rem; }
+            .cal-grid{ gap:.22rem; }
+            .cal-dow{ font-size:.6rem; padding:.15rem 0 .3rem; }
+            .cal-cell{ min-height:56px; padding:.28rem .22rem; border-radius:4px; gap:.15rem; }
+            .cal-date{ font-size:.62rem; }
+            .cal-place{ font-size:.6rem; line-height:1.2; }
+            /* shrink the travel/ferry badge and its text clearance */
+            .cal-cell.travel::after,
+            .cal-cell.ferry::after{ width:.95rem; height:.95rem; top:.22rem; left:.22rem; font-size:.58rem; }
+            .cal-cell.travel .cal-date,
+            .cal-cell.ferry .cal-date{ padding-inline-start:1.1rem; }
+        }
+        @media (max-width:380px){
+            .cal-grid{ gap:.16rem; }
+            .cal-dow{ font-size:.52rem; }
+            .cal-cell{ min-height:52px; padding:.22rem .16rem; }
+            .cal-date{ font-size:.56rem; }
+            .cal-place{ font-size:.54rem; }
         }
     </style>
 </head>
