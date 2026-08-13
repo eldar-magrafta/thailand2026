@@ -123,7 +123,7 @@
             min-width:0;
         }
         .cal-dow{
-            font-family:'Fraunces', serif; font-weight:600; font-size:.82rem;
+            font-family:'Fraunces', serif; font-weight:600; font-size:.95rem;
             color:var(--lemon); text-align:center; padding:.2rem 0 .5rem;
         }
         .cal-cell{
@@ -177,12 +177,6 @@
         /* keep text clear of the badge */
         .cal-cell.travel .cal-date,
         .cal-cell.ferry .cal-date{ padding-inline-start:1.7rem; }
-        .cal-legend{
-            display:flex; flex-wrap:wrap; justify-content:center; gap:.5rem 1rem;
-            margin-top:1.1rem; font-size:.78rem; color:rgba(246,238,220,0.85);
-        }
-        .cal-legend span{ display:inline-flex; align-items:center; gap:.35rem; }
-        .cal-legend i{ width:12px; height:12px; border-radius:3px; display:inline-block; }
 
         /* ---------- TIMELINE WRAPPER ---------- */
         .journal{
@@ -1268,7 +1262,7 @@
             .hero{ padding:3rem .6rem 2.6rem; }
             .hero-cal{ padding:1.4rem .6rem 1.6rem; }
             .cal-grid{ gap:.22rem; }
-            .cal-dow{ font-size:.6rem; padding:.15rem 0 .3rem; }
+            .cal-dow{ font-size:.72rem; padding:.15rem 0 .3rem; }
             .cal-cell{ min-height:56px; padding:.28rem .22rem; border-radius:4px; gap:.15rem; }
             .cal-date{ font-size:.62rem; }
             .cal-place{ font-size:.6rem; line-height:1.2; }
@@ -1280,7 +1274,7 @@
         }
         @media (max-width:380px){
             .cal-grid{ gap:.16rem; }
-            .cal-dow{ font-size:.52rem; }
+            .cal-dow{ font-size:.64rem; }
             .cal-cell{ min-height:52px; padding:.22rem .16rem; }
             .cal-date{ font-size:.56rem; }
             .cal-place{ font-size:.54rem; }
@@ -1347,15 +1341,6 @@
                 <div class="cal-cell empty"></div>
                 <div class="cal-cell empty"></div>
             </div>
-        </div>
-        <div class="cal-legend">
-            <span><i style="background:#A51931"></i> בנגקוק</span>
-            <span><i style="background:#2D2A4A"></i> קו טאו</span>
-            <span><i style="background:#D8A63A"></i> קוסמוי</span>
-            <span><i style="background:#607850"></i> צ׳יאנג מאי</span>
-            <span><i style="background:#6D6AA0"></i> הונג קונג / מקאו</span>
-            <span><i style="background:#3F7878"></i> קאו לאק</span>
-            <span><i style="background:#F6EEDC"></i> ✈ מעבר / טיסה</span>
         </div>
     </div>
 </header>
