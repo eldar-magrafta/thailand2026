@@ -128,6 +128,7 @@
         }
         .cal-cell{
             position:relative;
+            min-width:0;  /* allow the 1fr track to shrink so cells never overflow the box */
             min-height:74px; padding:.5rem .55rem; border-radius:6px;
             background:rgba(246,238,220,0.08);
             border:1px solid rgba(246,238,220,0.16);
@@ -139,7 +140,7 @@
             font-family:'Fraunces', serif; font-weight:600; font-size:.82rem;
             color:rgba(246,238,220,0.7);
         }
-        .cal-place{ font-size:.86rem; line-height:1.35; color:var(--paper); font-weight:600; }
+        .cal-place{ font-size:.86rem; line-height:1.35; color:var(--paper); font-weight:600; overflow-wrap:anywhere; }
         /* region accents */
         .cal-cell.r-bangkok{ background:rgba(165,25,49,0.30); border-color:rgba(165,25,49,0.5); }
         .cal-cell.r-kotao{ background:rgba(45,42,74,0.42); border-color:rgba(120,116,170,0.5); }
