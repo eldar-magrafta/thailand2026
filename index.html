@@ -517,7 +517,18 @@
             opacity:.9;
         }
         .plan-info a{ color:var(--terracotta-deep); }
-        .plan-info a.maplink{ white-space:nowrap; }
+        /* location links — same look as the italy-trip לוז tab (Fraunces italic, dotted underline, 📍) */
+        .plan-info a.maplink{
+            font-family:'Fraunces', serif; font-style:italic; font-weight:500;
+            color:var(--terracotta-deep); text-decoration:none;
+            border-bottom:1px dotted var(--terracotta-deep);
+            transition:opacity .15s ease;
+        }
+        .plan-info a.maplink.lat{ direction:ltr; unicode-bidi:isolate; }
+        .plan-info a.maplink:hover, .plan-info a.maplink:active{ opacity:.7; }
+        .plan-info a.maplink::after{
+            content:"📍"; font-size:.7em; margin-inline-start:.25em; opacity:.85;
+        }
         /* small icon-button link (e.g. Instagram) — like the tiktok/tripadvisor buttons */
         .icon-btn{
             display:inline-flex;
@@ -1358,34 +1369,34 @@
             <div class="plan-info">
                 <div class="plan-day">26.9 <small>שבת</small></div>
                 <ul>
-                    <li>ארוחת בוקר ב־<strong>Eggtisan by commonroom x ari</strong></li>
+                    <li>ארוחת בוקר ב־<a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=Eggtisan+by+commonroom+x+ari+Bangkok+Thailand" target="_blank" rel="noopener">Eggtisan by commonroom x ari</a></li>
                     <li>סיבוב בשכונת <strong>ARI</strong> — רחובות יפים וחנויות בוטיק נחמדות</li>
-                    <li>להיכנס ל־<strong>GUMP's Ari Community Space</strong></li>
-                    <li>חנויות בוטיק בשכונה: <strong>HIDE.Selected</strong> · <strong>MADBACON</strong> · <strong>fumiikii tokyo</strong></li>
-                    <li>משם להמשיך לשוק <strong>Chatuchak</strong></li>
+                    <li>להיכנס ל־<a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=GUMP+Ari+Community+Space+Bangkok+Thailand" target="_blank" rel="noopener">GUMP's Ari Community Space</a></li>
+                    <li>חנויות בוטיק בשכונה: <a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=HIDE.Selected+Ari+Bangkok+Thailand" target="_blank" rel="noopener">HIDE.Selected</a> · <a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=MADBACON+Ari+Bangkok+Thailand" target="_blank" rel="noopener">MADBACON</a> · <a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=fumiikii+tokyo+Ari+Bangkok+Thailand" target="_blank" rel="noopener">fumiikii tokyo</a></li>
+                    <li>משם להמשיך לשוק <a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=Chatuchak+Weekend+Market+Bangkok+Thailand" target="_blank" rel="noopener">Chatuchak</a></li>
                 </ul>
             </div>
             <div class="plan-info">
                 <div class="plan-day">27.9 <small>ראשון</small></div>
                 <ul>
                     <li>שכונת <strong>Song Wat</strong> (סונג וואט)</li>
-                    <li>קפה ומאפה: <strong>LOCAL BOYS COFFEE CO. SONG WAT</strong> או <strong>Song Wat Coffee Roasters</strong></li>
+                    <li>קפה ומאפה: <a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=LOCAL+BOYS+COFFEE+CO+Song+Wat+Bangkok+Thailand" target="_blank" rel="noopener">LOCAL BOYS COFFEE CO. SONG WAT</a> או <a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=Song+Wat+Coffee+Roasters+Bangkok+Thailand" target="_blank" rel="noopener">Song Wat Coffee Roasters</a></li>
                     <li><span class="pi-note">Song Wat הוא כקילומטר של רחוב היסטורי על הנהר — עדיין יש בו חנויות סיטונאות ועסקים סיניים ישנים ממש ליד החנויות החדשות.</span></li>
-                    <li>חנויות: <strong>CLAY CIRCLE</strong> / <strong>OYSTER & THINGS</strong> (קרמיקה) · <strong>TUDI EYEWEAR</strong> (משקפי שמש+ראייה) · <strong>WABI's</strong> (בייגלים)</li>
-                    <li>להמשיך לשכונת <strong>TALAT NOI</strong></li>
-                    <li>לקראת הערב — צ׳יינה טאון, <strong>Yaowarat Road</strong> (מגיע לשיא משעה 18:00)</li>
+                    <li>חנויות: <a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=CLAY+CIRCLE+Song+Wat+Bangkok+Thailand" target="_blank" rel="noopener">CLAY CIRCLE</a> / <a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=OYSTER+THINGS+Song+Wat+Bangkok+Thailand" target="_blank" rel="noopener">OYSTER & THINGS</a> (קרמיקה) · <a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=TUDI+EYEWEAR+Bangkok+Thailand" target="_blank" rel="noopener">TUDI EYEWEAR</a> (משקפי שמש+ראייה) · <strong>WABI's</strong> (בייגלים)</li>
+                    <li>להמשיך לשכונת <a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=Talat+Noi+Bangkok+Thailand" target="_blank" rel="noopener">TALAT NOI</a></li>
+                    <li>לקראת הערב — צ׳יינה טאון, <a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=Yaowarat+Road+Bangkok+Thailand" target="_blank" rel="noopener">Yaowarat Road</a> (מגיע לשיא משעה 18:00)</li>
                 </ul>
             </div>
             <div class="plan-info">
                 <div class="plan-day">28.9 <small>שני</small></div>
                 <ul>
                     <li><strong>קניות</strong></li>
-                    <li><strong>Siam Center / MBK</strong> — קניון</li>
-                    <li><strong>Siam Square</strong> — רחובות קטנים מול Siam Center: חנויות עצמאיות, אופנה צעירה, קוסמטיקה ואקססוריז</li>
-                    <li>חנות ללכת אליה: <strong>TRES</strong></li>
-                    <li>צהריים ב־<strong>Sushiro</strong> (סושירו)</li>
-                    <li>בערב: <strong>ICONSIAM</strong></li>
-                    <li>שוק לילה: <strong>Train Night Market Srinagarindra</strong> או <strong>ח'אוסאן (Khaosan)</strong></li>
+                    <li><a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=Siam+Center+Bangkok+Thailand" target="_blank" rel="noopener">Siam Center / MBK</a> — קניון</li>
+                    <li><a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=Siam+Square+Bangkok+Thailand" target="_blank" rel="noopener">Siam Square</a> — רחובות קטנים מול Siam Center: חנויות עצמאיות, אופנה צעירה, קוסמטיקה ואקססוריז</li>
+                    <li>חנות ללכת אליה: <a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=TRES+shop+Siam+Square+Bangkok+Thailand" target="_blank" rel="noopener">TRES</a></li>
+                    <li>צהריים ב־<a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=Sushiro+Bangkok+Thailand" target="_blank" rel="noopener">Sushiro</a> (סושירו)</li>
+                    <li>בערב: <a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=ICONSIAM+Bangkok+Thailand" target="_blank" rel="noopener">ICONSIAM</a></li>
+                    <li>שוק לילה: <a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=Train+Night+Market+Srinagarindra+Bangkok+Thailand" target="_blank" rel="noopener">Train Night Market Srinagarindra</a> או <a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Khaosan+Road+Bangkok+Thailand" target="_blank" rel="noopener">ח'אוסאן (Khaosan)</a></li>
                 </ul>
             </div>
             <div class="plan-info">
@@ -1401,9 +1412,9 @@
             <div class="plan-info">
                 <div class="plan-day">11.10 <small>ראשון</small></div>
                 <ul>
-                    <li><strong>K11 MUSEA</strong> — תצפית על הנהר וכל העיר</li>
-                    <li>להמשיך ל־<strong>Avenue of Stars</strong></li>
-                    <li><strong>Symphony of Lights</strong> — מדי ערב ב־20:00 (Avenue of Stars היא נקודת צפייה רשמית)</li>
+                    <li><a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=K11+MUSEA+Hong+Kong" target="_blank" rel="noopener">K11 MUSEA</a> — תצפית על הנהר וכל העיר</li>
+                    <li>להמשיך ל־<a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=Avenue+of+Stars+Tsim+Sha+Tsui+Hong+Kong" target="_blank" rel="noopener">Avenue of Stars</a></li>
+                    <li><a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=A+Symphony+of+Lights+Hong+Kong" target="_blank" rel="noopener">Symphony of Lights</a> — מדי ערב ב־20:00 (Avenue of Stars היא נקודת צפייה רשמית)</li>
                     <li>ארוחת ערב</li>
                 </ul>
             </div>
@@ -1411,8 +1422,8 @@
                 <div class="plan-day">12.10 <small>שני</small></div>
                 <ul>
                     <li>ארוחת בוקר</li>
-                    <li>עלייה ל<strong>ויקטוריה פיק</strong> בטראם</li>
-                    <li><strong>PoHo / Tai Ping Shan Street</strong> — רחובות קטנים, אמנות, גלריות ובתי קפה בשכונה ותיקה</li>
+                    <li>עלייה ל<a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Victoria+Peak+Hong+Kong" target="_blank" rel="noopener">ויקטוריה פיק</a> בטראם</li>
+                    <li><a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=Tai+Ping+Shan+Street+Sheung+Wan+Hong+Kong" target="_blank" rel="noopener">PoHo / Tai Ping Shan Street</a> — רחובות קטנים, אמנות, גלריות ובתי קפה בשכונה ותיקה</li>
                     <li>חזרה למרכז: <strong>Hollywood Road + Staunton Street</strong> — מסלול: Tai Ping Shan → Po Hing Fong → Square Street → Hollywood Road</li>
                     <li>לקראת ערב: <strong>מונג קוק</strong> — ליידיס מרקט + סניקרס סטריט</li>
                 </ul>
@@ -1421,10 +1432,10 @@
                 <div class="plan-day">13.10 <small>שלישי · מקאו</small></div>
                 <ul>
                     <li>לא לשכוח להביא <strong>דרכון</strong>!</li>
-                    <li>מעבורת ל־<strong>Taipa Terminal</strong></li>
-                    <li><strong>Taipa Village</strong> · <strong>Rua do Cunha</strong> (רחוב צבעוני חמוד) · <strong>Taipa Houses</strong> (בתי אחוזה קולוניאליים בצבע ירוק־מנטה ליד המים)</li>
-                    <li><strong>COTAI</strong> (מקאו החדשה) — סיבוב בין המלונות והמתחמים; <strong>Studio City</strong> (הגלגל הענק)</li>
-                    <li>מקאו העתיקה: <strong>Senado Square</strong> (רצפה שחור־לבן, אדריכלות פורטוגזית) · <strong>Travessa da Paixão</strong> (רחוב ורוד)</li>
+                    <li>מעבורת ל־<a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=Taipa+Ferry+Terminal+Macau" target="_blank" rel="noopener">Taipa Terminal</a></li>
+                    <li><a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=Taipa+Village+Macau" target="_blank" rel="noopener">Taipa Village</a> · <a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=Rua+do+Cunha+Taipa+Macau" target="_blank" rel="noopener">Rua do Cunha</a> (רחוב צבעוני חמוד) · <a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=Taipa+Houses+Museum+Macau" target="_blank" rel="noopener">Taipa Houses</a> (בתי אחוזה קולוניאליים בצבע ירוק־מנטה ליד המים)</li>
+                    <li><a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=Cotai+Macau" target="_blank" rel="noopener">COTAI</a> (מקאו החדשה) — סיבוב בין המלונות והמתחמים; <a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=Studio+City+Macau" target="_blank" rel="noopener">Studio City</a> (הגלגל הענק)</li>
+                    <li>מקאו העתיקה: <a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=Senado+Square+Macau" target="_blank" rel="noopener">Senado Square</a> (רצפה שחור־לבן, אדריכלות פורטוגזית) · <a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=Travessa+da+Paixao+Macau" target="_blank" rel="noopener">Travessa da Paixão</a> (רחוב ורוד)</li>
                     <li>מעבורת חזרה להונג קונג</li>
                 </ul>
             </div>
@@ -1432,10 +1443,10 @@
                 <div class="plan-day">14.10 <small>רביעי · Sham Shui Po</small></div>
                 <ul>
                     <li><span class="pi-note">שכונה ותיקה וצפופה בקאולון — מרכז היסטורי של טקסטיל, תפירה, עור, אלקטרוניקה ומלאכת יד, ובשנים האחרונות גם בתי קפה, סטודיואים ואמנות עכשווית לצד העסקים הישנים.</span></li>
-                    <li><strong>Tai Nan Street</strong></li>
-                    <li><strong>DX design hub</strong></li>
-                    <li><strong>Harbour City</strong> — קניון</li>
-                    <li>ראמן: <strong>Shugetsu</strong></li>
+                    <li><a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=Tai+Nan+Street+Sham+Shui+Po+Hong+Kong" target="_blank" rel="noopener">Tai Nan Street</a></li>
+                    <li><a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=DX+design+hub+Sham+Shui+Po+Hong+Kong" target="_blank" rel="noopener">DX design hub</a></li>
+                    <li><a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=Harbour+City+Tsim+Sha+Tsui+Hong+Kong" target="_blank" rel="noopener">Harbour City</a> — קניון</li>
+                    <li>ראמן: <a class="maplink lat" href="https://www.google.com/maps/search/?api=1&query=Shugetsu+Ramen+Hong+Kong" target="_blank" rel="noopener">Shugetsu</a></li>
                 </ul>
             </div>
             <div class="plan-info">
@@ -1919,16 +1930,15 @@
             return json.record || {};
         }
 
-        // Persist lists under the "lists" key, preserving other keys (notes/expenses)
+        // Persist: the record IS the map of section-name → items. Flat and simple.
         async function persist() {
-            const record = await fetchRecord();          // freshest shared state
             await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-Master-Key': JSONBIN_API_KEY
                 },
-                body: JSON.stringify({ ...record, lists: data })
+                body: JSON.stringify(data)
             });
         }
 
@@ -2092,7 +2102,7 @@
         async function load() {
             try {
                 const record = await fetchRecord();
-                data = record.lists || {};
+                data = record || {};
             } catch (e) {
                 console.log('List load error:', e);
                 data = {};
