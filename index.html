@@ -146,6 +146,15 @@
         .cal-cell.r-chiangmai{ background:rgba(96,120,80,0.34); border-color:rgba(140,170,110,0.5); }
         .cal-cell.r-hongkong{ background:rgba(45,42,74,0.5); border-color:rgba(150,146,200,0.55); }
         .cal-cell.r-khaolak{ background:rgba(63,120,120,0.30); border-color:rgba(90,180,180,0.5); }
+        /* current day — neon green with a halo on all four sides */
+        .cal-cell.today{
+            z-index:2;
+            border:2px solid #39ff14;
+            box-shadow:0 0 6px rgba(57,255,20,0.95),
+                       0 0 14px rgba(57,255,20,0.6),
+                       0 0 22px rgba(57,255,20,0.35);
+        }
+        .cal-cell.today .cal-date{ color:#39ff14; }
         .cal-cell.travel{
             background:rgba(246,238,220,0.14);
             border:1px solid var(--lemon);
@@ -544,18 +553,6 @@
             color:var(--terracotta-deep);
             margin-inline-start:.4rem;
         }
-        /* visited toggle on list cards */
-        .item-visit{
-            width:34px; height:34px; flex-shrink:0;
-            border-radius:10px; border:1px solid transparent; background:transparent;
-            display:flex; align-items:center; justify-content:center;
-            cursor:pointer; font-size:1rem; line-height:1; opacity:.5;
-            transition:all .18s ease;
-        }
-        .item-visit:hover{ opacity:1; background:rgba(47,75,60,.12); border-color:var(--cypress); }
-        .extras-item.visited{ background:rgba(47,75,60,.10); border-color:var(--cypress); }
-        .extras-item.visited .extras-name{ text-decoration:line-through; opacity:.75; }
-        .extras-item.visited .item-visit{ opacity:1; }
         /* currency converter */
         .currency-section{ max-width:520px; margin:2.5rem auto; padding:0 1.5rem; }
         .currency-card{
@@ -1669,7 +1666,7 @@
 <div class="main-panel" data-panel="hotels">
     <section class="extras-section">
         <div class="sub-content active">
-            <p class="extras-summary">עלויות מלונות<span class="total">סה״כ מלונות — ₪<span id="hotelsTotal">0</span></span></p>
+            <p class="extras-summary"><span class="total">סה״כ מלונות — ₪<span id="hotelsTotal">0</span></span></p>
             <div class="item-list" data-list-key="hotels"></div>
             <div class="add-form" data-list-target="hotels" data-fields="name,city,note,price">
                 <input class="add-input" type="text" data-field="name" placeholder="שם המלון">
@@ -1695,10 +1692,11 @@
 <div class="main-panel" data-panel="flights">
     <section class="extras-section">
         <div class="sub-content active">
-            <p class="extras-summary">עלויות טיסות<span class="total">סה״כ טיסות — ₪<span id="flightsTotal">0</span></span></p>
+            <p class="extras-summary"><span class="total">סה״כ טיסות — ₪<span id="flightsTotal">0</span></span></p>
             <div class="item-list" data-list-key="flights"></div>
-            <div class="add-form" data-list-target="flights" data-fields="name,note,price">
-                <input class="add-input" type="text" data-field="name" placeholder="מסלול הטיסה">
+            <div class="add-form" data-list-target="flights" data-fields="from,to,note,price">
+                <input class="add-input" type="text" data-field="from" placeholder="מוצא">
+                <input class="add-input" type="text" data-field="to" placeholder="יעד">
                 <input class="add-input" type="text" data-field="note" placeholder="הערה">
                 <input class="add-input price" type="text" inputmode="numeric" data-field="price" placeholder="מחיר">
                 <button type="button" class="add-btn">+ הוספה</button>
@@ -1800,15 +1798,6 @@
         // In-memory model: { listKey: [ {name, note, price?}, ... ] }
         let data = {};
 
-        // Visited markers — personal, stored locally (not shared)
-        const VISIT_KEY = 'thailand-visited';
-        let visited = new Set();
-        try { visited = new Set(JSON.parse(localStorage.getItem(VISIT_KEY) || '[]')); } catch (_) {}
-        const visitId = (key, item) => `${key}|${(item && item.name) || ''}`;
-        function saveVisited() {
-            try { localStorage.setItem(VISIT_KEY, JSON.stringify([...visited])); } catch (_) {}
-        }
-
         const hotelsTotalEl = document.getElementById('hotelsTotal');
         const flightsTotalEl = document.getElementById('flightsTotal');
 
@@ -1854,16 +1843,14 @@
                 const noteHtml = item.note
                     ? `<div class="extras-desc">${esc(item.note)}</div>`
                     : '';
-                const isVisited = visited.has(visitId(key, item));
                 return `
-                <div class="extras-item${isVisited ? ' visited' : ''}" draggable="true" data-list="${key}" data-index="${i}">
+                <div class="extras-item" draggable="true" data-list="${key}" data-index="${i}">
                     <div class="item-drag" title="גררו לשינוי סדר" aria-label="גרירה">⠿</div>
                     <div class="extras-body">
                         <div class="extras-header">
                             <div class="extras-name">${esc(item.name)}${cityHtml}</div>
                             <div class="extras-actions">
                                 ${priceHtml}
-                                <button type="button" class="item-visit" data-list="${key}" data-index="${i}" title="סמנו כביקרנו" aria-label="ביקרנו">${isVisited ? '✅' : '⭕'}</button>
                                 <button type="button" class="item-edit" data-list="${key}" data-index="${i}" title="עריכה" aria-label="עריכה">✏️</button>
                                 <button type="button" class="item-del" data-list="${key}" data-index="${i}" title="מחיקה" aria-label="מחיקה">🗑️</button>
                             </div>
@@ -1945,6 +1932,15 @@
             });
         }
 
+        // For from/to lists (flights) build the display name as "מוצא → יעד"
+        function normalizeItem(it) {
+            if (('from' in it) || ('to' in it)) {
+                const f = (it.from || '').trim(), t = (it.to || '').trim();
+                it.name = (f || t) ? `${f} ← ${t}` : '';
+            }
+            return it;
+        }
+
         // Add-form handlers
         document.querySelectorAll('.add-form').forEach(form => {
             const key = form.dataset.listTarget;
@@ -1954,6 +1950,7 @@
             async function add() {
                 const item = {};
                 fieldInputs.forEach(inp => { item[inp.dataset.field] = inp.value.trim(); });
+                normalizeItem(item);
                 if (!item.name) { fieldInputs[0].focus(); return; }
 
                 if (!data[key]) data[key] = [];
@@ -1986,17 +1983,6 @@
         lists.forEach(container => {
             const key = container.dataset.listKey;
             container.addEventListener('click', async e => {
-                const visit = e.target.closest('.item-visit');
-                if (visit) {
-                    const idx = Number(visit.dataset.index);
-                    const item = (data[key] || [])[idx];
-                    if (!item) return;
-                    const id = visitId(key, item);
-                    if (visited.has(id)) visited.delete(id); else visited.add(id);
-                    saveVisited();
-                    renderList(key);   // local-only, no shared write
-                    return;
-                }
                 const del = e.target.closest('.item-del');
                 if (del) {
                     const idx = Number(del.dataset.index);
@@ -2019,6 +2005,7 @@
                     itemEl.querySelectorAll('.add-input').forEach(inp => {
                         updated[inp.dataset.field] = inp.value.trim();
                     });
+                    normalizeItem(updated);
                     if (!updated.name) { itemEl.querySelector('.add-input').focus(); return; }
                     data[key][idx] = updated;
                     await saveAndRerender(key);
@@ -2217,6 +2204,22 @@
         refresh();                        // on every page load / refresh
         setInterval(refresh, REFRESH_MS); // and every 30 minutes while open
         setInterval(renderStatus, 60000); // keep the "time ago" label current each minute
+    })();
+
+    // Highlight today's calendar cell (neon green) — only while the trip is on,
+    // in 2026. Cell dates are "D/M"; re-check hourly so it advances at midnight.
+    (function () {
+        const cells = Array.from(document.querySelectorAll('.cal-cell'))
+            .map(cell => ({ cell, date: (cell.querySelector('.cal-date') || {}).textContent }))
+            .filter(c => c.date);
+        function mark() {
+            const now = new Date();
+            if (now.getFullYear() !== 2026) return;
+            const key = now.getDate() + '/' + (now.getMonth() + 1);
+            cells.forEach(({ cell, date }) => cell.classList.toggle('today', date.trim() === key));
+        }
+        mark();
+        setInterval(mark, 3600000); // hourly, so it moves on to the next day
     })();
 
     // Register service worker for offline support (installable PWA)
