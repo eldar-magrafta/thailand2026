@@ -1,7 +1,7 @@
 /* Service worker for the איטליה 2026 trip page.
    Goal: full offline use on spotty Italian signal, installable to home screen. */
 
-const VERSION = 'italy-trip-v1';
+const VERSION = 'italy-trip-v2';
 const PRECACHE = VERSION + '-precache';
 const RUNTIME = VERSION + '-runtime';
 
@@ -56,6 +56,10 @@ self.addEventListener('fetch', (event) => {
 
   // Never touch the notes API (jsonbin) — it must always be live and never cached.
   if (url.hostname.endsWith('jsonbin.io')) return;
+
+  // Never touch the exchange-rate API — always hit the network so the call is
+  // fresh and visible in the Network tab on every refresh.
+  if (url.hostname.endsWith('er-api.com')) return;
 
   // Navigations (the HTML page): network-first so edits show up, fall back to
   // the cached page when offline.

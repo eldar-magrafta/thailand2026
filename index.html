@@ -315,14 +315,6 @@
             font-family:'Fraunces', serif; font-style:italic; color:#8a7a5e; font-size:.85rem;
         }
 
-        /* ---------- WEATHER ---------- */
-        .weather{
-            display:flex; align-items:center; gap:.5rem;
-            margin-top:.6rem; font-size:.82rem; color:var(--blue);
-        }
-        .weather svg{ width:18px; height:18px; flex-shrink:0; }
-        .weather-temp{ font-weight:600; }
-
         /* ---------- COLLAPSIBLE ---------- */
         .day-head{ cursor:pointer; user-select:none; }
         .day-head::after{
@@ -475,6 +467,112 @@
             margin-bottom:1.2rem;
             line-height:1.6;
         }
+        /* static reference pulled from the trip plan (read-only) */
+        .plan-info{
+            margin:0 0 1.25rem;
+            padding:1rem 1.15rem;
+            background:rgba(232,180,58,.12);
+            border:1px solid var(--line);
+            border-inline-start:4px solid var(--lemon);
+            border-radius:12px;
+        }
+        .plan-info-tag{
+            display:inline-block;
+            font-family:'Fraunces', serif;
+            font-weight:600;
+            font-size:.72rem;
+            letter-spacing:.06em;
+            color:var(--terracotta-deep);
+            margin-bottom:.5rem;
+        }
+        .plan-info ul{
+            list-style:none;
+            margin:0;
+            padding:0;
+            display:flex;
+            flex-direction:column;
+            gap:.55rem;
+        }
+        .plan-info li{
+            line-height:1.55;
+            color:var(--ink);
+            direction:rtl;
+            text-align:right;
+        }
+        .plan-info li strong{ color:var(--blue-deep); }
+        .plan-info .pi-note{
+            display:block;
+            font-size:.88rem;
+            color:#54483d;
+            opacity:.9;
+        }
+        .plan-info a{ color:var(--terracotta-deep); }
+        .plan-info a.maplink{ white-space:nowrap; }
+        /* small icon-button link (e.g. Instagram) — like the tiktok/tripadvisor buttons */
+        .icon-btn{
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            width:30px;
+            height:30px;
+            border-radius:6px;
+            border:1px solid var(--line);
+            background:var(--paper);
+            vertical-align:middle;
+            transition:all .2s ease;
+            text-decoration:none;
+        }
+        .icon-btn:hover{ background:var(--lemon); border-color:var(--lemon); }
+        .icon-btn svg{ width:17px; height:17px; color:var(--ink); }
+        /* itinerary day heading */
+        .plan-day{
+            font-family:'Frank Ruhl Libre', serif;
+            font-weight:700;
+            font-size:1.08rem;
+            color:var(--blue-deep);
+            margin:0 0 .7rem;
+            direction:rtl;
+            text-align:right;
+        }
+        .plan-day small{
+            display:inline-block;
+            font-family:'Fraunces', serif;
+            font-style:italic;
+            font-weight:500;
+            font-size:.82rem;
+            color:var(--terracotta-deep);
+            margin-inline-start:.4rem;
+        }
+        /* visited toggle on list cards */
+        .item-visit{
+            width:34px; height:34px; flex-shrink:0;
+            border-radius:10px; border:1px solid transparent; background:transparent;
+            display:flex; align-items:center; justify-content:center;
+            cursor:pointer; font-size:1rem; line-height:1; opacity:.5;
+            transition:all .18s ease;
+        }
+        .item-visit:hover{ opacity:1; background:rgba(47,75,60,.12); border-color:var(--cypress); }
+        .extras-item.visited{ background:rgba(47,75,60,.10); border-color:var(--cypress); }
+        .extras-item.visited .extras-name{ text-decoration:line-through; opacity:.75; }
+        .extras-item.visited .item-visit{ opacity:1; }
+        /* currency converter */
+        .currency-section{ max-width:520px; margin:2.5rem auto; padding:0 1.5rem; }
+        .currency-card{
+            background:var(--paper-deep); border:1px solid var(--line);
+            border-radius:14px; padding:1.5rem;
+        }
+        .currency-row{ display:flex; align-items:center; gap:.7rem; margin-bottom:.7rem; }
+        .currency-row label{
+            flex:0 0 7rem; font-weight:600; color:var(--blue-deep); font-size:.9rem;
+            display:flex; align-items:center; gap:.4rem;
+        }
+        .currency-row input{
+            flex:1; min-width:0; padding:.6rem .85rem; border:1px solid var(--line);
+            border-radius:8px; background:var(--paper); font-size:1.05rem; direction:ltr; text-align:right;
+            font-variant-numeric:tabular-nums; color:var(--ink);
+        }
+        .currency-row input:focus{ outline:none; border-color:var(--terracotta); box-shadow:0 0 0 3px rgba(165,25,49,.12); }
+        .currency-note{ margin-top:.9rem; font-size:.78rem; color:var(--blue); opacity:.8; font-style:italic; }
         /* ---------- USER ITEM CARDS ---------- */
         .item-list{
             display:flex;
@@ -1238,16 +1336,122 @@
 
 <!-- TOP NAVIGATION -->
 <nav class="top-nav">
-    <button class="top-nav-tab active" data-panel="food">🍜 אוכל</button>
+    <button class="top-nav-tab active" data-panel="route">🗺️ מסלול</button>
+    <button class="top-nav-tab" data-panel="food">🍜 אוכל</button>
     <button class="top-nav-tab" data-panel="places">📍 אתרים</button>
     <button class="top-nav-tab" data-panel="shopping">🛍️ קניות</button>
+    <button class="top-nav-tab" data-panel="wishlist">⭐ משאלות</button>
     <button class="top-nav-tab" data-panel="hotels">🏨 מלונות</button>
     <button class="top-nav-tab" data-panel="flights">✈️ טיסות</button>
+    <button class="top-nav-tab" data-panel="currency">💱 המרה</button>
 </nav>
 
 
+<!-- ROUTE / ITINERARY PANEL -->
+<div class="main-panel active" data-panel="route">
+    <section class="extras-section">
+        <div class="sub-tabs">
+            <button class="sub-tab active" data-city="route-bangkok">בנגקוק</button>
+            <button class="sub-tab" data-city="route-hongkong">הונג קונג</button>
+        </div>
+
+        <!-- BANGKOK ITINERARY -->
+        <div class="sub-content active" data-city="route-bangkok">
+            <div class="plan-info">
+                <div class="plan-day">26.9 <small>שבת</small></div>
+                <ul>
+                    <li>ארוחת בוקר ב־<strong>Eggtisan by commonroom x ari</strong></li>
+                    <li>סיבוב בשכונת <strong>ARI</strong> — רחובות יפים וחנויות בוטיק נחמדות</li>
+                    <li>להיכנס ל־<strong>GUMP's Ari Community Space</strong></li>
+                    <li>חנויות בוטיק בשכונה: <strong>HIDE.Selected</strong> · <strong>MADBACON</strong> · <strong>fumiikii tokyo</strong></li>
+                    <li>משם להמשיך לשוק <strong>Chatuchak</strong></li>
+                </ul>
+            </div>
+            <div class="plan-info">
+                <div class="plan-day">27.9 <small>ראשון</small></div>
+                <ul>
+                    <li>שכונת <strong>Song Wat</strong> (סונג וואט)</li>
+                    <li>קפה ומאפה: <strong>LOCAL BOYS COFFEE CO. SONG WAT</strong> או <strong>Song Wat Coffee Roasters</strong></li>
+                    <li><span class="pi-note">Song Wat הוא כקילומטר של רחוב היסטורי על הנהר — עדיין יש בו חנויות סיטונאות ועסקים סיניים ישנים ממש ליד החנויות החדשות.</span></li>
+                    <li>חנויות: <strong>CLAY CIRCLE</strong> / <strong>OYSTER & THINGS</strong> (קרמיקה) · <strong>TUDI EYEWEAR</strong> (משקפי שמש+ראייה) · <strong>WABI's</strong> (בייגלים)</li>
+                    <li>להמשיך לשכונת <strong>TALAT NOI</strong></li>
+                    <li>לקראת הערב — צ׳יינה טאון, <strong>Yaowarat Road</strong> (מגיע לשיא משעה 18:00)</li>
+                </ul>
+            </div>
+            <div class="plan-info">
+                <div class="plan-day">28.9 <small>שני</small></div>
+                <ul>
+                    <li><strong>קניות</strong></li>
+                    <li><strong>Siam Center / MBK</strong> — קניון</li>
+                    <li><strong>Siam Square</strong> — רחובות קטנים מול Siam Center: חנויות עצמאיות, אופנה צעירה, קוסמטיקה ואקססוריז</li>
+                    <li>חנות ללכת אליה: <strong>TRES</strong></li>
+                    <li>צהריים ב־<strong>Sushiro</strong> (סושירו)</li>
+                    <li>בערב: <strong>ICONSIAM</strong></li>
+                    <li>שוק לילה: <strong>Train Night Market Srinagarindra</strong> או <strong>ח'אוסאן (Khaosan)</strong></li>
+                </ul>
+            </div>
+            <div class="plan-info">
+                <div class="plan-day">29.9 <small>שלישי</small></div>
+                <ul>
+                    <li>טיסה לקוסמוי ומעבורת לקו טאו</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- HONG KONG ITINERARY -->
+        <div class="sub-content" data-city="route-hongkong">
+            <div class="plan-info">
+                <div class="plan-day">11.10 <small>ראשון</small></div>
+                <ul>
+                    <li><strong>K11 MUSEA</strong> — תצפית על הנהר וכל העיר</li>
+                    <li>להמשיך ל־<strong>Avenue of Stars</strong></li>
+                    <li><strong>Symphony of Lights</strong> — מדי ערב ב־20:00 (Avenue of Stars היא נקודת צפייה רשמית)</li>
+                    <li>ארוחת ערב</li>
+                </ul>
+            </div>
+            <div class="plan-info">
+                <div class="plan-day">12.10 <small>שני</small></div>
+                <ul>
+                    <li>ארוחת בוקר</li>
+                    <li>עלייה ל<strong>ויקטוריה פיק</strong> בטראם</li>
+                    <li><strong>PoHo / Tai Ping Shan Street</strong> — רחובות קטנים, אמנות, גלריות ובתי קפה בשכונה ותיקה</li>
+                    <li>חזרה למרכז: <strong>Hollywood Road + Staunton Street</strong> — מסלול: Tai Ping Shan → Po Hing Fong → Square Street → Hollywood Road</li>
+                    <li>לקראת ערב: <strong>מונג קוק</strong> — ליידיס מרקט + סניקרס סטריט</li>
+                </ul>
+            </div>
+            <div class="plan-info">
+                <div class="plan-day">13.10 <small>שלישי · מקאו</small></div>
+                <ul>
+                    <li>לא לשכוח להביא <strong>דרכון</strong>!</li>
+                    <li>מעבורת ל־<strong>Taipa Terminal</strong></li>
+                    <li><strong>Taipa Village</strong> · <strong>Rua do Cunha</strong> (רחוב צבעוני חמוד) · <strong>Taipa Houses</strong> (בתי אחוזה קולוניאליים בצבע ירוק־מנטה ליד המים)</li>
+                    <li><strong>COTAI</strong> (מקאו החדשה) — סיבוב בין המלונות והמתחמים; <strong>Studio City</strong> (הגלגל הענק)</li>
+                    <li>מקאו העתיקה: <strong>Senado Square</strong> (רצפה שחור־לבן, אדריכלות פורטוגזית) · <strong>Travessa da Paixão</strong> (רחוב ורוד)</li>
+                    <li>מעבורת חזרה להונג קונג</li>
+                </ul>
+            </div>
+            <div class="plan-info">
+                <div class="plan-day">14.10 <small>רביעי · Sham Shui Po</small></div>
+                <ul>
+                    <li><span class="pi-note">שכונה ותיקה וצפופה בקאולון — מרכז היסטורי של טקסטיל, תפירה, עור, אלקטרוניקה ומלאכת יד, ובשנים האחרונות גם בתי קפה, סטודיואים ואמנות עכשווית לצד העסקים הישנים.</span></li>
+                    <li><strong>Tai Nan Street</strong></li>
+                    <li><strong>DX design hub</strong></li>
+                    <li><strong>Harbour City</strong> — קניון</li>
+                    <li>ראמן: <strong>Shugetsu</strong></li>
+                </ul>
+            </div>
+            <div class="plan-info">
+                <div class="plan-day">15.10 <small>חמישי</small></div>
+                <ul>
+                    <li><strong>דיסני</strong></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+</div><!-- END ROUTE PANEL -->
+
 <!-- FOOD PANEL -->
-<div class="main-panel active" data-panel="food">
+<div class="main-panel" data-panel="food">
     <section class="extras-section">
         <div class="sub-tabs">
             <button class="sub-tab active" data-city="food-bangkok">בנגקוק</button>
@@ -1267,6 +1471,11 @@
             </div>
         </div>
         <div class="sub-content" data-city="food-kotao">
+            <div class="plan-info">
+                <ul>
+                    <li><strong>רשימת בתי קפה</strong><span class="pi-note"><a class="icon-btn" href="https://www.instagram.com/reel/DbAvxmWTZDs/?igsh=MXQxc3dlMm9rOGw0dA==" target="_blank" rel="noopener" title="Instagram" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 01-1.38-.9 3.7 3.7 0 01-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16zM12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63c-.79.31-1.46.72-2.13 1.38C1.35 2.68.94 3.35.63 4.14.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.31.79.72 1.46 1.38 2.13.67.66 1.34 1.07 2.13 1.38.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56.79-.31 1.46-.72 2.13-1.38.66-.67 1.07-1.34 1.38-2.13.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91-.31-.79-.72-1.46-1.38-2.13C21.32 1.35 20.65.94 19.86.63 19.1.33 18.22.13 16.95.07 15.67.01 15.26 0 12 0z"/><path d="M12 5.84A6.16 6.16 0 1018.16 12 6.16 6.16 0 0012 5.84zM12 16a4 4 0 114-4 4 4 0 01-4 4z"/><circle cx="18.41" cy="5.59" r="1.44"/></svg></a></span></li>
+                </ul>
+            </div>
             <div class="item-list" data-list-key="food-kotao"></div>
             <div class="add-form" data-list-target="food-kotao" data-fields="name,note">
                 <input class="add-input" type="text" data-field="name" placeholder="שם המקום">
@@ -1401,6 +1610,21 @@
             </div>
         </div>
         <div class="sub-content" data-city="shopping-samui">
+            <div class="plan-info">
+                <ul>
+                    <li><strong>שוק לילה כפר הדייגים</strong><span class="pi-note">Fisherman's Village night market</span></li>
+                </ul>
+            </div>
+            <div class="plan-info">
+                <ul>
+                    <li><strong>Lamai night market</strong><span class="pi-note">יש שמועות שהוא הכי זול ושווה את זה מאוד</span></li>
+                </ul>
+            </div>
+            <div class="plan-info">
+                <ul>
+                    <li><strong>שוק לילה צ׳אוונג</strong><span class="pi-note">Chaweng night market</span></li>
+                </ul>
+            </div>
             <div class="item-list" data-list-key="shopping-samui"></div>
             <div class="add-form" data-list-target="shopping-samui" data-fields="name,note">
                 <input class="add-input" type="text" data-field="name" placeholder="שם מקום הקניות">
@@ -1425,6 +1649,11 @@
             </div>
         </div>
         <div class="sub-content" data-city="shopping-khaolak">
+            <div class="plan-info">
+                <ul>
+                    <li><strong>Bangniang Market</strong><span class="pi-note">פתוח בימי שני, רביעי, חמישי ושבת. שוק אוכל, בגדים, תכשיטים ואקססוריז לבית. שוק גדול, מומלץ מאוד — לשים נעליים נוחות</span></li>
+                </ul>
+            </div>
             <div class="item-list" data-list-key="shopping-khaolak"></div>
             <div class="add-form" data-list-target="shopping-khaolak" data-fields="name,note">
                 <input class="add-input" type="text" data-field="name" placeholder="שם מקום הקניות">
@@ -1439,7 +1668,17 @@
 <div class="main-panel" data-panel="hotels">
     <section class="extras-section">
         <div class="sub-content active">
-            <p class="extras-summary">עלויות מלונות<span class="total">סה״כ מלונות — ₪<span id="hotelsTotal">0</span></span></p>
+            <p class="extras-summary">עלויות מלונות<span class="total">סה״כ מלונות לכל אחת — ₪2,929 לכל התקופה</span></p>
+            <div class="plan-info">
+                <ul>
+                    <li><strong>בנגקוק · ₪571</strong><span class="pi-note">The Mandison Bangkok (Formerly Golden Tulip Mandison Suites) · <a class="maplink" href="https://maps.app.goo.gl/QesjsCNurWdVgFBe6" target="_blank" rel="noopener">מפה ↗</a></span></li>
+                    <li><strong>קו טאו · ₪832</strong><span class="pi-note">The Tarna Resort, Ko Tao · <a class="maplink" href="https://maps.app.goo.gl/fkLC2G8c2aEKret6A" target="_blank" rel="noopener">מפה ↗</a></span></li>
+                    <li><strong>קוסמוי · ₪901 + 89</strong><span class="pi-note">The Culture Samui · <a class="maplink" href="https://maps.app.goo.gl/nXgkARVogkTDQtG89" target="_blank" rel="noopener">מפה ↗</a> · Nora LakeView · <a class="maplink" href="https://maps.app.goo.gl/eeY1TZ1JqwphLvvi6" target="_blank" rel="noopener">מפה ↗</a></span></li>
+                    <li><strong>צ׳יאנג מאי · ₪884</strong><span class="pi-note">THEE Vijit Lanna by TH District · <a class="maplink" href="https://maps.app.goo.gl/t7E7StM6EHTBawdDA" target="_blank" rel="noopener">מפה ↗</a></span></li>
+                    <li><strong>הונג קונג · ₪1,381</strong><span class="pi-note">Urbanwood Ap Lei Chau · <a class="maplink" href="https://maps.app.goo.gl/RNi8qxzmz9NSoXJB6" target="_blank" rel="noopener">מפה ↗</a></span></li>
+                    <li><strong>קאו לאק · ₪1,200</strong><span class="pi-note">La Solaya Khao Lak · <a class="maplink" href="https://maps.app.goo.gl/oTwvgkXKBBaqzFjp6" target="_blank" rel="noopener">מפה ↗</a></span></li>
+                </ul>
+            </div>
             <div class="item-list" data-list-key="hotels"></div>
             <div class="add-form" data-list-target="hotels" data-fields="name,city,note,price">
                 <input class="add-input" type="text" data-field="name" placeholder="שם המלון">
@@ -1466,6 +1705,15 @@
     <section class="extras-section">
         <div class="sub-content active">
             <p class="extras-summary">עלויות טיסות<span class="total">סה״כ טיסות — ₪<span id="flightsTotal">0</span></span></p>
+            <div class="plan-info">
+                <ul>
+                    <li><strong>ישראל — הלוך חזור · ₪3,857</strong><span class="pi-note">לכל אחת</span></li>
+                    <li><strong>בנגקוק → קוסמוי</strong><span class="pi-note">—</span></li>
+                    <li><strong>קוסמוי → צ׳יאנג מאי</strong><span class="pi-note">—</span></li>
+                    <li><strong>צ׳יאנג מאי → הונג קונג</strong><span class="pi-note">—</span></li>
+                    <li><strong>הונג קונג → פוקט</strong><span class="pi-note">—</span></li>
+                </ul>
+            </div>
             <div class="item-list" data-list-key="flights"></div>
             <div class="add-form" data-list-target="flights" data-fields="name,note,price">
                 <input class="add-input" type="text" data-field="name" placeholder="מסלול הטיסה">
@@ -1476,6 +1724,50 @@
         </div>
     </section>
 </div><!-- END FLIGHTS PANEL -->
+
+<!-- WISHLIST PANEL -->
+<div class="main-panel" data-panel="wishlist">
+    <section class="extras-section">
+        <div class="sub-content active">
+            <p class="sub-intro">רשימת משאלות קניות — דברים שרוצים לקנות או לחפש בטיול. הוסיפו פריטים למטה.</p>
+            <div class="item-list" data-list-key="wishlist"></div>
+            <div class="add-form" data-list-target="wishlist" data-fields="name,note">
+                <input class="add-input" type="text" data-field="name" placeholder="מה רוצים לקנות">
+                <input class="add-input" type="text" data-field="note" placeholder="הערה">
+                <button type="button" class="add-btn">+ הוספה</button>
+            </div>
+        </div>
+    </section>
+</div><!-- END WISHLIST PANEL -->
+
+<!-- CURRENCY PANEL -->
+<div class="main-panel" data-panel="currency">
+    <section class="currency-section">
+        <div class="currency-card">
+            <div class="currency-row">
+                <label>🇮🇱 שקל</label>
+                <input type="text" inputmode="decimal" data-cur="ILS" placeholder="0">
+            </div>
+            <div class="currency-row">
+                <label>🇹🇭 באט</label>
+                <input type="text" inputmode="decimal" data-cur="THB" placeholder="0">
+            </div>
+            <div class="currency-row">
+                <label>🇺🇸 דולר</label>
+                <input type="text" inputmode="decimal" data-cur="USD" placeholder="0">
+            </div>
+            <div class="currency-row">
+                <label>🇭🇰 דולר הונג קונגי</label>
+                <input type="text" inputmode="decimal" data-cur="HKD" placeholder="0">
+            </div>
+            <div class="currency-row">
+                <label>🇲🇴 פטקה מקאו</label>
+                <input type="text" inputmode="decimal" data-cur="MOP" placeholder="0">
+            </div>
+            <p class="currency-note"><span id="currencyStatus">טוען שערים…</span> · הקלידו סכום בכל שדה וההמרה תתעדכן אוטומטית.</p>
+        </div>
+    </section>
+</div><!-- END CURRENCY PANEL -->
 
 
 <script>
@@ -1526,6 +1818,15 @@
         // In-memory model: { listKey: [ {name, note, price?}, ... ] }
         let data = {};
 
+        // Visited markers — personal, stored locally (not shared)
+        const VISIT_KEY = 'thailand-visited';
+        let visited = new Set();
+        try { visited = new Set(JSON.parse(localStorage.getItem(VISIT_KEY) || '[]')); } catch (_) {}
+        const visitId = (key, item) => `${key}|${(item && item.name) || ''}`;
+        function saveVisited() {
+            try { localStorage.setItem(VISIT_KEY, JSON.stringify([...visited])); } catch (_) {}
+        }
+
         const hotelsTotalEl = document.getElementById('hotelsTotal');
         const flightsTotalEl = document.getElementById('flightsTotal');
 
@@ -1558,7 +1859,7 @@
             if (!container) return;
             const items = data[key] || [];
             if (!items.length) {
-                container.innerHTML = '<div class="empty-hint"><span>🗺️</span> אין פריטים עדיין — הוסיפו פריט למטה</div>';
+                container.innerHTML = '';
                 return;
             }
             container.innerHTML = items.map((item, i) => {
@@ -1571,14 +1872,16 @@
                 const noteHtml = item.note
                     ? `<div class="extras-desc">${esc(item.note)}</div>`
                     : '';
+                const isVisited = visited.has(visitId(key, item));
                 return `
-                <div class="extras-item" draggable="true" data-list="${key}" data-index="${i}">
+                <div class="extras-item${isVisited ? ' visited' : ''}" draggable="true" data-list="${key}" data-index="${i}">
                     <div class="item-drag" title="גררו לשינוי סדר" aria-label="גרירה">⠿</div>
                     <div class="extras-body">
                         <div class="extras-header">
                             <div class="extras-name">${esc(item.name)}${cityHtml}</div>
                             <div class="extras-actions">
                                 ${priceHtml}
+                                <button type="button" class="item-visit" data-list="${key}" data-index="${i}" title="סמנו כביקרנו" aria-label="ביקרנו">${isVisited ? '✅' : '⭕'}</button>
                                 <button type="button" class="item-edit" data-list="${key}" data-index="${i}" title="עריכה" aria-label="עריכה">✏️</button>
                                 <button type="button" class="item-del" data-list="${key}" data-index="${i}" title="מחיקה" aria-label="מחיקה">🗑️</button>
                             </div>
@@ -1701,6 +2004,17 @@
         lists.forEach(container => {
             const key = container.dataset.listKey;
             container.addEventListener('click', async e => {
+                const visit = e.target.closest('.item-visit');
+                if (visit) {
+                    const idx = Number(visit.dataset.index);
+                    const item = (data[key] || [])[idx];
+                    if (!item) return;
+                    const id = visitId(key, item);
+                    if (visited.has(id)) visited.delete(id); else visited.add(id);
+                    saveVisited();
+                    renderList(key);   // local-only, no shared write
+                    return;
+                }
                 const del = e.target.closest('.item-del');
                 if (del) {
                     const idx = Number(del.dataset.index);
@@ -1821,77 +2135,106 @@
         load();       // then hydrate from the shared bin
     })();
 
-    // Weather Forecast (WeatherAPI.com - free, requires API key)
-    (async function() {
-        // Get your free API key at: https://www.weatherapi.com/signup.aspx
-        const API_KEY = '1d2882f7a065478cbe084601261507';
+    // Currency quick-convert — live rates (units per 1 USD) from exchangerate-api.com's
+    // free open endpoint (no key). Refreshes on load + every 30 min; cached for offline.
+    (function() {
+        const CURRENCIES = ['USD', 'ILS', 'THB', 'HKD', 'MOP'];
+        // Offline fallback — used only until the first successful fetch / when no cache exists
+        let RATES = { USD: 1, ILS: 3.7, THB: 36, HKD: 7.8, MOP: 8.03 };
+        const CACHE_KEY = 'thailand-rates';
+        const REFRESH_MS = 30 * 60 * 1000;
 
-        const locations = {
-            roma: { query: 'Rome,Italy', days: [1, 2] },
-            sorrento: { query: 'Sorrento,Italy', days: [3, 4, 5] },
-            napoli: { query: 'Naples,Italy', days: [6] }
-        };
+        const inputs = Array.from(document.querySelectorAll('.currency-row input[data-cur]'));
+        const statusEl = document.getElementById('currencyStatus');
+        if (!inputs.length) return;
 
-        const tripDates = ['2026-07-24', '2026-07-25', '2026-07-26', '2026-07-27', '2026-07-28', '2026-07-29'];
-        const weatherElements = document.querySelectorAll('.weather');
+        let lastSource = null;   // remember which field the user typed in, to re-convert on rate update
 
-        function getWeatherIcon(isDay, code) {
-            // Sunny/Clear
-            if (code === 1000) return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>`;
-            // Cloudy
-            if (code >= 1003 && code <= 1009) return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17.5 19H9a7 7 0 116.71-9h1.79a4.5 4.5 0 110 9z"/></svg>`;
-            // Rain
-            if (code >= 1063 && code <= 1201) return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 13V5a4 4 0 00-8 0v8"/><path d="M8 19l.5 1M12 19l.5 1M16 19l.5 1M17.5 13H9a7 7 0 116.71-5h1.79a4.5 4.5 0 110 5z"/></svg>`;
-            // Default sun
-            return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>`;
+        function fmt(n) {
+            if (!isFinite(n)) return '';
+            return Number(n.toFixed(2)).toLocaleString('en-US', { maximumFractionDigits: 2 });
         }
 
-        async function fetchWeather(query) {
-            const url = `https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${encodeURIComponent(query)}&days=10`;
+        function recalc(source) {
+            if (!source) return;
+            const raw = parseFloat(source.value.replace(/,/g, ''));
+            if (isNaN(raw)) {
+                inputs.forEach(inp => { if (inp !== source) inp.value = ''; });
+                return;
+            }
+            const usd = raw / RATES[source.dataset.cur];
+            inputs.forEach(inp => {
+                if (inp === source) return;
+                inp.value = fmt(usd * RATES[inp.dataset.cur]);
+            });
+        }
 
+        function setStatus(text) { if (statusEl) statusEl.textContent = text; }
+
+        let lastUpdatedMs = null, lastLive = false;
+
+        // Hebrew "how long ago" from a timestamp
+        function timeAgo(ms) {
+            const diff = Date.now() - ms;
+            if (!isFinite(diff) || diff < 0) return '';
+            const min = Math.round(diff / 60000);
+            if (min < 1) return 'ממש עכשיו';
+            if (min === 1) return 'לפני דקה';
+            if (min < 60) return `לפני ${min} דקות`;
+            const hrs = Math.round(min / 60);
+            if (hrs === 1) return 'לפני שעה';
+            if (hrs === 2) return 'לפני שעתיים';
+            if (hrs < 24) return `לפני ${hrs} שעות`;
+            const days = Math.round(hrs / 24);
+            if (days === 1) return 'לפני יום';
+            if (days === 2) return 'לפני יומיים';
+            return `לפני ${days} ימים`;
+        }
+
+        function renderStatus() {
+            if (lastUpdatedMs == null) { setStatus('שערים משוערים'); return; }
+            const ago = timeAgo(lastUpdatedMs);
+            setStatus(lastLive
+                ? `שערים חיים · עודכנו ${ago}`
+                : `שערים שמורים (לא מקוון) · עודכנו ${ago}`);
+        }
+
+        function applyRates(rates, updatedMs, live) {
+            CURRENCIES.forEach(c => { if (typeof rates[c] === 'number' && rates[c] > 0) RATES[c] = rates[c]; });
+            if (lastSource) recalc(lastSource);
+            lastUpdatedMs = updatedMs || null;
+            lastLive = live;
+            renderStatus();
+        }
+
+        // Seed instantly from cache so it works offline / before the network responds
+        try {
+            const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+            if (cached && cached.rates) applyRates(cached.rates, cached.updated, false);
+        } catch (_) {}
+
+        async function refresh() {
             try {
-                const res = await fetch(url);
-                if (!res.ok) return null;
+                const res = await fetch('https://open.er-api.com/v6/latest/USD', { cache: 'no-store' });
+                if (!res.ok) throw new Error('http ' + res.status);
                 const json = await res.json();
-                console.log('Weather API response:', json);
-                return json;
+                if (json.result !== 'success' || !json.rates) throw new Error('bad payload');
+                const picked = {};
+                CURRENCIES.forEach(c => { if (typeof json.rates[c] === 'number') picked[c] = json.rates[c]; });
+                const updated = json.time_last_update_unix ? json.time_last_update_unix * 1000 : Date.now();
+                applyRates(picked, updated, true);
+                try { localStorage.setItem(CACHE_KEY, JSON.stringify({ rates: picked, updated })); } catch (_) {}
             } catch (e) {
-                console.log('Weather API error:', e);
-                return null;
+                console.log('Rates fetch error:', e);
+                if (statusEl && !localStorage.getItem(CACHE_KEY)) setStatus('שערים משוערים (לא הצליח לעדכן)');
             }
         }
 
-        // Fetch weather for each location (3 calls total)
-        const weatherData = {};
-        for (const [city, info] of Object.entries(locations)) {
-            const data = await fetchWeather(info.query);
-            if (data && data.forecast && data.forecast.forecastday) {
-                const forecastDays = data.forecast.forecastday;
-                info.days.forEach(dayNum => {
-                    const targetDate = tripDates[dayNum - 1];
-                    const match = forecastDays.find(fd => fd.date === targetDate);
-                    if (match) {
-                        weatherData[dayNum] = {
-                            temp: Math.round(match.day.maxtemp_c),
-                            desc: match.day.condition.text,
-                            code: match.day.condition.code
-                        };
-                    }
-                });
-            }
-        }
+        inputs.forEach(inp => inp.addEventListener('input', () => { lastSource = inp; recalc(inp); }));
 
-        // Update weather elements
-        weatherElements.forEach((el, idx) => {
-            const dayNum = idx + 1;
-            const data = weatherData[dayNum];
-            if (data) {
-                el.innerHTML = `
-                ${getWeatherIcon(true, data.code)}
-                <span class="weather-temp">${data.temp}°C</span> · ${data.desc}
-            `;
-            }
-        });
+        refresh();                        // on every page load / refresh
+        setInterval(refresh, REFRESH_MS); // and every 30 minutes while open
+        setInterval(renderStatus, 60000); // keep the "time ago" label current each minute
     })();
 
     // Register service worker for offline support (installable PWA)
