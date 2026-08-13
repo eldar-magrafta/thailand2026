@@ -1,7 +1,7 @@
 {
-  "name": "איטליה 2026 — רומא · סורנטו · נאפולי",
-  "short_name": "איטליה 2026",
-  "description": "מסלול הטיול לאיטליה — רומא, סורנטו ונאפולי.",
+  "name": "תאילנד 2026 — בנגקוק · קוסמוי · צ׳יאנג מאי",
+  "short_name": "תאילנד 2026",
+  "description": "מסלול הטיול לתאילנד — בנגקוק, האיים, צ׳יאנג מאי והונג קונג.",
   "lang": "he",
   "dir": "rtl",
   "start_url": ".",
@@ -9,7 +9,7 @@
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#F6EEDC",
-  "theme_color": "#C1502E",
+  "theme_color": "#A51931",
   "icons": [
     {
       "src": "icon-192.png",

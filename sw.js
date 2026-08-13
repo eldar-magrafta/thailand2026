@@ -1,7 +1,7 @@
-/* Service worker for the איטליה 2026 trip page.
-   Goal: full offline use on spotty Italian signal, installable to home screen. */
+/* Service worker for the תאילנד 2026 trip page.
+   Goal: full offline use on spotty signal, installable to home screen. */
 
-const VERSION = 'italy-trip-v2';
+const VERSION = 'thailand-trip-v3';
 const PRECACHE = VERSION + '-precache';
 const RUNTIME = VERSION + '-runtime';
 
