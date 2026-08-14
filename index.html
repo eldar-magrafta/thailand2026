@@ -61,6 +61,14 @@
             color:var(--ink);
             font-family:'Rubik', sans-serif;
             -webkit-font-smoothing:antialiased;
+            /* block text selection / copy / long-press callout across the app */
+            -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none;
+            -webkit-touch-callout:none;
+        }
+        /* keep the editable fields fully usable (type, select, edit) */
+        input, textarea{
+            -webkit-user-select:text; -moz-user-select:text; -ms-user-select:text; user-select:text;
+            -webkit-touch-callout:default;
         }
 
         .lat{ direction:ltr; unicode-bidi:isolate; font-family:'Fraunces', serif; }
@@ -2232,6 +2240,17 @@
         }
         mark();
         setInterval(mark, 3600000); // hourly, so it moves on to the next day
+    })();
+
+    // Block copy / cut / right-click context menu everywhere except inside
+    // editable fields (so users can still edit their own list entries).
+    (function() {
+        const editable = t => t && t.closest && t.closest('input, textarea');
+        ['copy', 'cut', 'contextmenu'].forEach(evt => {
+            document.addEventListener(evt, e => {
+                if (!editable(e.target)) e.preventDefault();
+            });
+        });
     })();
 
     // Disable pinch-zoom and double-tap zoom (iOS ignores user-scalable=no,
