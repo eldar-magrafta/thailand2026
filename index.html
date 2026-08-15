@@ -1992,6 +1992,11 @@
             });
         }
 
+        // Lists that get a "done" checkbox + strike-through: the wishlist plus
+        // every food / places / shopping city list. (Hotels & flights are budget
+        // rows, so they keep their plain layout.)
+        const hasCheck = key => key === 'wishlist' || /^(food|places|shopping)-/.test(key);
+
         // Render one list's items into its container
         function renderList(key) {
             const container = document.querySelector(`.item-list[data-list-key="${key}"]`);
@@ -2011,9 +2016,10 @@
                 const noteHtml = item.note
                     ? `<div class="extras-desc">${esc(item.note)}</div>`
                     : '';
-                // Wishlist items get a "got it" checkbox on the right; when checked
-                // the card is struck through. The done state is saved like any field.
-                const checkHtml = key === 'wishlist'
+                // Food / places / shopping / wishlist items get a "done" checkbox
+                // on the right; when checked the card is struck through. The done
+                // state is saved like any other field.
+                const checkHtml = hasCheck(key)
                     ? `<input type="checkbox" class="item-check" data-list="${key}" data-index="${i}"${item.done ? ' checked' : ''} title="סמן כבוצע" aria-label="סמן כבוצע">`
                     : '';
                 return `
