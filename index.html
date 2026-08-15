@@ -383,11 +383,13 @@
             white-space:nowrap;
             text-align:center;
         }
-        .top-nav-tab:hover{
-            background:var(--lemon);
-            color:var(--ink);
-            border-color:var(--lemon);
-            transform:translateY(-1px);
+        @media (hover:hover){
+            .top-nav-tab:hover{
+                background:var(--lemon);
+                color:var(--ink);
+                border-color:var(--lemon);
+                transform:translateY(-1px);
+            }
         }
         .top-nav-tab.active{
             background:var(--terracotta);
@@ -471,10 +473,12 @@
             cursor:pointer;
             transition:transform .18s ease, background .18s ease, color .18s ease, border-color .18s ease, box-shadow .18s ease;
         }
-        .sub-tab:hover{
-            background:var(--lemon);
-            color:var(--ink);
-            transform:translateY(-1px);
+        @media (hover:hover){
+            .sub-tab:hover{
+                background:var(--lemon);
+                color:var(--ink);
+                transform:translateY(-1px);
+            }
         }
         .sub-tab.active{
             background:var(--terracotta);
