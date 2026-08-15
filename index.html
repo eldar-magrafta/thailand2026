@@ -640,6 +640,34 @@
         .confirm-yes:hover{ background:var(--terracotta-deep); }
         .confirm-cancel{ background:var(--paper-deep); color:var(--ink); }
         .confirm-cancel:hover{ background:#e4d5b3; }
+
+        /* ---------- pull-to-refresh ---------- */
+        .ptr{
+            position:fixed;
+            top:10px; left:50%; margin-left:-19px;
+            width:38px; height:38px;
+            border-radius:50%;
+            background:var(--paper);
+            border:1px solid var(--line);
+            box-shadow:0 8px 20px -8px rgba(43,36,32,.5);
+            display:flex; align-items:center; justify-content:center;
+            z-index:1500;
+            opacity:0;
+            transform:translateY(-70px);
+            pointer-events:none;
+            will-change:transform, opacity;
+        }
+        .ptr-spin{
+            width:20px; height:20px;
+            border:2.5px solid rgba(45,42,74,.25);
+            border-top-color:var(--terracotta);
+            border-radius:50%;
+        }
+        .ptr.ready .ptr-spin{ border-top-color:var(--cypress); }
+        .ptr.spin{ transition:opacity .2s ease; }
+        .ptr.spin .ptr-spin{ animation:ptrspin .7s linear infinite; }
+        @keyframes ptrspin{ to{ transform:rotate(360deg); } }
+
         .extras-item{
             position:relative;
             display:flex;
@@ -2124,12 +2152,14 @@
             if (retryTimer) return;
             retryTimer = setTimeout(() => { retryTimer = null; if (dirty.size) flush(); }, 15000);
         }
-        // Retry pending saves when we regain connectivity or the app regains focus
-        // (e.g. reopening the PWA after it was backgrounded).
-        window.addEventListener('online', () => { if (dirty.size) flush(); });
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden && dirty.size) flush();
-        });
+        // Re-sync whenever we regain connectivity or the app returns to the
+        // foreground. A PWA resumes from memory instead of reloading, so without
+        // this a change made on another device (e.g. marking a wishlist item done
+        // on a laptop) would never show up here. load() also pushes any pending
+        // local edits, so this covers both directions.
+        window.addEventListener('online', () => load());
+        document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
+        window.addEventListener('pageshow', () => load());   // bfcache / PWA resume
 
         // For from/to lists (flights) build the display name as "מוצא → יעד"
         function normalizeItem(it) {
@@ -2312,9 +2342,13 @@
             } catch (e) {
                 console.log('List load error (using local copy):', e);
             }
-            renderAll();
+            // Don't repaint over an inline edit the user has open right now.
+            if (!document.querySelector('.extras-item.editing')) renderAll();
             if (dirty.size) flush();   // push edits queued while offline
         }
+
+        // Let the pull-to-refresh gesture trigger a fresh sync.
+        window.refreshTripData = load;
 
         // Seed instantly from the offline mirror so content shows up even before
         // (or without) the network — then hydrate/merge from the shared bin.
@@ -2468,6 +2502,75 @@
             if (now - lastTouch < 300) e.preventDefault();   // double-tap zoom
             lastTouch = now;
         }, { passive: false });
+    })();
+
+    // Pull-to-refresh: drag down from the very top to re-sync with the shared
+    // bin. Needed mainly in the installed PWA, which resumes from memory and
+    // otherwise won't pick up changes made on another device.
+    (function() {
+        const THRESHOLD = 64;   // px pulled (after resistance) to trigger
+        const MAX = 96;         // cap how far the indicator travels
+        const HIDDEN = -70;     // resting position above the screen
+
+        const el = document.createElement('div');
+        el.className = 'ptr';
+        el.setAttribute('aria-hidden', 'true');
+        el.innerHTML = '<div class="ptr-spin"></div>';
+        document.body.appendChild(el);
+        const spin = el.querySelector('.ptr-spin');
+
+        let startY = 0, pulling = false, dist = 0, refreshing = false;
+
+        const atTop = () => (window.scrollY || document.documentElement.scrollTop || 0) <= 0;
+
+        function place(y, opacity) {
+            el.style.transform = `translateY(${y}px)`;
+            el.style.opacity = opacity;
+        }
+        function reset() {
+            el.classList.remove('spin', 'ready');
+            place(HIDDEN, 0);
+            spin.style.transform = '';
+            dist = 0; pulling = false;
+        }
+
+        async function doRefresh() {
+            refreshing = true;
+            el.classList.add('spin');
+            el.classList.remove('ready');
+            place(THRESHOLD, 1);
+            spin.style.transform = '';
+            try { if (window.refreshTripData) await window.refreshTripData(); }
+            catch (_) {}
+            // keep the spinner up briefly so the refresh reads as intentional
+            setTimeout(() => { refreshing = false; reset(); }, 500);
+        }
+
+        window.addEventListener('touchstart', e => {
+            if (refreshing || e.touches.length !== 1 || !atTop()) { pulling = false; return; }
+            startY = e.touches[0].clientY;
+            pulling = true; dist = 0;
+        }, { passive: true });
+
+        window.addEventListener('touchmove', e => {
+            if (!pulling || refreshing) return;
+            const d = e.touches[0].clientY - startY;
+            if (d <= 0 || !atTop()) { reset(); return; }
+            dist = Math.min(MAX, d * 0.5);   // rubber-band resistance
+            place(Math.min(dist, THRESHOLD) - 6, Math.min(1, dist / THRESHOLD));
+            spin.style.transform = `rotate(${dist * 3}deg)`;
+            el.classList.toggle('ready', dist >= THRESHOLD);
+            if (e.cancelable) e.preventDefault();   // suppress overscroll bounce
+        }, { passive: false });
+
+        window.addEventListener('touchend', () => {
+            if (!pulling || refreshing) return;
+            pulling = false;
+            if (dist >= THRESHOLD) doRefresh();
+            else reset();
+        });
+
+        reset();
     })();
 
     // Register service worker for offline support (installable PWA)
