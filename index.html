@@ -730,24 +730,6 @@
             opacity:.9;
         }
         /* drag handle */
-        .item-drag{
-            flex-shrink:0;
-            width:26px;
-            align-self:stretch;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            cursor:grab;
-            color:var(--blue);
-            opacity:.35;
-            font-size:1.05rem;
-            line-height:1;
-            border-radius:8px;
-            transition:opacity .18s ease, background .18s ease;
-            touch-action:none;
-        }
-        .item-drag:hover{ opacity:.8; background:rgba(201,183,143,.18); }
-        .item-drag:active{ cursor:grabbing; }
         /* wishlist "got it" checkbox (sits on the right in RTL) */
         .item-check{
             flex-shrink:0;
@@ -767,15 +749,6 @@
             text-decoration-thickness:2px;
         }
         .extras-body{ flex:1; min-width:0; display:flex; flex-direction:column; gap:.5rem; }
-        /* while dragging */
-        .extras-item.dragging{
-            opacity:.55;
-            box-shadow:0 14px 30px -12px rgba(43,36,32,.5);
-            border-color:var(--terracotta);
-            cursor:grabbing;
-        }
-        .extras-item.drop-before{ box-shadow:0 -3px 0 -1px var(--terracotta); }
-        .extras-item.drop-after{ box-shadow:0 3px 0 -1px var(--terracotta); }
         /* edit button */
         .item-edit{
             width:28px;
@@ -2064,10 +2037,9 @@
                     ? `<input type="checkbox" class="item-check" data-list="${key}" data-index="${i}"${item.done ? ' checked' : ''} title="סמן כבוצע" aria-label="סמן כבוצע">`
                     : '';
                 return `
-                <div class="extras-item${item.done ? ' done' : ''}" draggable="true" data-list="${key}" data-index="${i}">
+                <div class="extras-item${item.done ? ' done' : ''}" data-list="${key}" data-index="${i}">
                     <button type="button" class="item-del" data-list="${key}" data-index="${i}" title="מחיקה" aria-label="מחיקה">✕</button>
                     ${checkHtml}
-                    <div class="item-drag" title="גררו לשינוי סדר" aria-label="גרירה">⠿</div>
                     <div class="extras-body">
                         <div class="extras-header">
                             <div class="extras-name">${esc(item.name)}${linkHtml}${cityHtml}</div>
@@ -2100,7 +2072,6 @@
             const item = (data[key] || [])[idx];
             if (!item) return;
             itemEl.classList.add('editing');
-            itemEl.setAttribute('draggable', 'false');
             const body = itemEl.querySelector('.extras-body');
             const fields = fieldsFor(key);
             const inputsHtml = fields.map(f => {
@@ -2326,68 +2297,6 @@
                 if (!itemEl) return;
                 if (e.key === 'Enter') { e.preventDefault(); itemEl.querySelector('.edit-save').click(); }
                 else if (e.key === 'Escape') { itemEl.querySelector('.edit-cancel').click(); }
-            });
-        });
-
-        // ---- Drag to reorder ----
-        let dragKey = null, dragFrom = null;
-
-        function clearDropMarks(container) {
-            container.querySelectorAll('.drop-before, .drop-after')
-                .forEach(el => el.classList.remove('drop-before', 'drop-after'));
-        }
-
-        lists.forEach(container => {
-            const key = container.dataset.listKey;
-
-            container.addEventListener('dragstart', e => {
-                const itemEl = e.target.closest('.extras-item');
-                if (!itemEl || itemEl.classList.contains('editing')) { e.preventDefault(); return; }
-                dragKey = key;
-                dragFrom = Number(itemEl.dataset.index);
-                itemEl.classList.add('dragging');
-                e.dataTransfer.effectAllowed = 'move';
-                try { e.dataTransfer.setData('text/plain', String(dragFrom)); } catch (_) {}
-            });
-
-            container.addEventListener('dragover', e => {
-                if (dragKey !== key) return;
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
-                const over = e.target.closest('.extras-item');
-                clearDropMarks(container);
-                if (!over || over.classList.contains('dragging')) return;
-                const rect = over.getBoundingClientRect();
-                const before = (e.clientY - rect.top) < rect.height / 2;
-                over.classList.add(before ? 'drop-before' : 'drop-after');
-            });
-
-            container.addEventListener('drop', async e => {
-                if (dragKey !== key) return;
-                e.preventDefault();
-                const over = e.target.closest('.extras-item');
-                clearDropMarks(container);
-                const arr = data[key];
-                if (!arr || dragFrom == null) return;
-
-                let to = arr.length - 1;
-                if (over && !over.classList.contains('dragging')) {
-                    const overIdx = Number(over.dataset.index);
-                    const rect = over.getBoundingClientRect();
-                    const before = (e.clientY - rect.top) < rect.height / 2;
-                    to = before ? overIdx : overIdx + 1;
-                    if (dragFrom < to) to--;   // account for removal shift
-                }
-                const [moved] = arr.splice(dragFrom, 1);
-                arr.splice(Math.max(0, Math.min(to, arr.length)), 0, moved);
-                dragKey = null; dragFrom = null;
-                await saveAndRerender(key);
-            });
-
-            container.addEventListener('dragend', () => {
-                clearDropMarks(container);
-                container.querySelectorAll('.dragging').forEach(el => el.classList.remove('dragging'));
-                dragKey = null; dragFrom = null;
             });
         });
 
