@@ -1918,7 +1918,6 @@
         // even after the browser or PWA is closed and reopened.
         let dirty = new Set();
         let flushing = false;      // a save round is in flight
-        let flushAgain = false;    // a change arrived mid-flush; run once more after
 
         // ---- localStorage mirror (survives offline; instant paint on load) ----
         function cacheLocal() {
@@ -2107,35 +2106,52 @@
             if (!res.ok) throw new Error('put failed');
         }
 
+        // Merge a freshly-fetched server record into our in-memory model:
+        // adopt the server's version for every list EXCEPT ones we currently
+        // have unsynced edits on (those stay as our local copy). Used after both
+        // a load and a save so untouched tabs reflect the server without ever
+        // clobbering an edit made while the request was in flight.
+        function adoptRemote(remote) {
+            Object.keys(remote).forEach(k => { if (!dirty.has(k)) data[k] = remote[k]; });
+            Object.keys(data).forEach(k => {
+                if (!(k in remote) && !dirty.has(k)) delete data[k];
+            });
+        }
+
         // Save changed lists to the bin without clobbering anything else.
         // Read-modify-write: pull the latest record, overlay ONLY the lists we
         // changed locally, then write back. This means edits made on another
         // device/tab to *other* tabs are never lost, and a failed load can never
         // wipe the bin (we merge into the live record, not into an empty object).
         async function flush() {
-            if (flushing) { flushAgain = true; return; }
-            if (!dirty.size) return;
+            if (flushing || !dirty.size) return;
             flushing = true;
+            // Take the set we're about to save and clear it NOW. Any edit that
+            // arrives while the request is in flight re-adds its key to `dirty`,
+            // so it survives this round and triggers another flush below. (This
+            // is the fix for "marked two items, only one saved": the second
+            // toggle used to be erased by a blanket dirty.clear().)
+            const sending = Array.from(dirty);
+            sending.forEach(k => dirty.delete(k));
             try {
                 const remote = await fetchRecord();          // latest server truth
-                const changed = Array.from(dirty);
-                changed.forEach(k => { remote[k] = data[k] || []; });
+                sending.forEach(k => { remote[k] = data[k] || []; });
                 await putRecord(remote);
-                // Adopt the merged record so untouched tabs reflect the server too.
-                data = remote;
-                dirty.clear();
+                adoptRemote(remote);
                 cacheLocal();
                 // Don't repaint over an inline edit the user has open right now.
                 if (!document.querySelector('.extras-item.editing')) renderAll();
             } catch (e) {
-                // Network/API failure: keep the change queued in localStorage and
-                // retry later (on reconnect, tab focus, or the next edit).
+                // Network/API failure: re-queue what we tried to send (merged with
+                // anything newly dirtied) and retry later — on reconnect, tab
+                // focus, the next edit, or the retry timer.
                 console.log('List save deferred (will retry):', e);
+                sending.forEach(k => dirty.add(k));
                 cacheLocal();
                 scheduleRetry();
             } finally {
                 flushing = false;
-                if (flushAgain) { flushAgain = false; flush(); }
+                if (dirty.size) flush();   // pick up edits made during this round
             }
         }
 
@@ -2331,13 +2347,7 @@
                 const record = await fetchRecord();
                 // Keep any locally-made edits that haven't synced yet (dirty keys)
                 // and let the server be the source of truth for everything else.
-                Object.keys(record).forEach(k => {
-                    if (!dirty.has(k)) data[k] = record[k];
-                });
-                // Drop tabs the server no longer has, unless we have pending edits there.
-                Object.keys(data).forEach(k => {
-                    if (!(k in record) && !dirty.has(k)) delete data[k];
-                });
+                adoptRemote(record);
                 cacheLocal();
             } catch (e) {
                 console.log('List load error (using local copy):', e);
