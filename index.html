@@ -592,6 +592,52 @@
             flex-direction:column;
             gap:.75rem;
         }
+
+        /* ---------- confirm (delete) dialog ---------- */
+        .confirm-overlay{
+            position:fixed; inset:0; z-index:1000;
+            display:flex; align-items:center; justify-content:center;
+            padding:1.5rem;
+            background:rgba(28,26,48,0.55);
+            -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px);
+            animation:confirmFade .15s ease;
+        }
+        @keyframes confirmFade{ from{opacity:0;} to{opacity:1;} }
+        .confirm-box{
+            direction:rtl;
+            width:min(340px, 100%);
+            background:var(--paper);
+            border:1px solid var(--line);
+            border-radius:16px;
+            box-shadow:0 18px 50px rgba(28,26,48,0.35);
+            padding:1.4rem 1.3rem 1.15rem;
+            text-align:center;
+            animation:confirmPop .16s ease;
+        }
+        @keyframes confirmPop{ from{transform:scale(.94); opacity:0;} to{transform:scale(1); opacity:1;} }
+        .confirm-msg{
+            font-family:'Frank Ruhl Libre', serif;
+            font-weight:700;
+            font-size:1.15rem;
+            color:var(--ink);
+            line-height:1.5;
+            margin-bottom:1.2rem;
+        }
+        .confirm-actions{ display:flex; gap:.7rem; }
+        .confirm-actions button{
+            flex:1;
+            padding:.7rem .5rem;
+            border-radius:10px;
+            font-family:'Rubik', sans-serif;
+            font-weight:600;
+            font-size:1rem;
+            cursor:pointer;
+            border:1px solid var(--line);
+        }
+        .confirm-yes{ background:var(--terracotta); color:#fff; border-color:var(--terracotta-deep); }
+        .confirm-yes:hover{ background:var(--terracotta-deep); }
+        .confirm-cancel{ background:var(--paper-deep); color:var(--ink); }
+        .confirm-cancel:hover{ background:#e4d5b3; }
         .extras-item{
             position:relative;
             display:flex;
@@ -1812,12 +1858,36 @@
     (function() {
         const JSONBIN_API_KEY = '$2a$10$..XKN1.FgA1/FO3o86hcC.ZbddgA4mmMFep4L7KeJpgdL3HkxHk1u';
         const BIN_ID = '6a575823da38895dfe603bd4';
+        const LOCAL_KEY = 'thailand-lists';        // offline mirror of the bin
+        const DIRTY_KEY = 'thailand-lists-dirty';  // keys edited but not yet synced
 
         const lists = Array.from(document.querySelectorAll('.item-list'));
         if (!lists.length) return;
 
         // In-memory model: { listKey: [ {name, note, price?}, ... ] }
         let data = {};
+        // Keys the user changed locally that still need to reach the bin.
+        // Persisted to localStorage so a failed/offline save is retried later,
+        // even after the browser or PWA is closed and reopened.
+        let dirty = new Set();
+        let flushing = false;      // a save round is in flight
+        let flushAgain = false;    // a change arrived mid-flush; run once more after
+
+        // ---- localStorage mirror (survives offline; instant paint on load) ----
+        function cacheLocal() {
+            try {
+                localStorage.setItem(LOCAL_KEY, JSON.stringify(data));
+                localStorage.setItem(DIRTY_KEY, JSON.stringify(Array.from(dirty)));
+            } catch (_) {}
+        }
+        function readCache() {
+            try {
+                const d = JSON.parse(localStorage.getItem(LOCAL_KEY) || 'null');
+                const k = JSON.parse(localStorage.getItem(DIRTY_KEY) || '[]');
+                if (Array.isArray(k)) dirty = new Set(k);
+                return (d && typeof d === 'object') ? d : null;
+            } catch (_) { return null; }
+        }
 
         const hotelsTotalEl = document.getElementById('hotelsTotal');
         const flightsTotalEl = document.getElementById('flightsTotal');
@@ -1843,6 +1913,37 @@
             return String(s == null ? '' : s)
                 .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;');
+        }
+
+        // Styled RTL confirm dialog → resolves true (כן) / false (ביטול).
+        function confirmDialog(message) {
+            return new Promise(resolve => {
+                const overlay = document.createElement('div');
+                overlay.className = 'confirm-overlay';
+                overlay.innerHTML = `
+                    <div class="confirm-box" role="alertdialog" aria-modal="true">
+                        <div class="confirm-msg">${esc(message)}</div>
+                        <div class="confirm-actions">
+                            <button type="button" class="confirm-yes">כן, למחוק</button>
+                            <button type="button" class="confirm-cancel">ביטול</button>
+                        </div>
+                    </div>`;
+                function close(val) {
+                    document.removeEventListener('keydown', onKey);
+                    overlay.remove();
+                    resolve(val);
+                }
+                function onKey(e) {
+                    if (e.key === 'Escape') close(false);
+                    else if (e.key === 'Enter') close(true);
+                }
+                overlay.querySelector('.confirm-yes').addEventListener('click', () => close(true));
+                overlay.querySelector('.confirm-cancel').addEventListener('click', () => close(false));
+                overlay.addEventListener('click', e => { if (e.target === overlay) close(false); });
+                document.addEventListener('keydown', onKey);
+                document.body.appendChild(overlay);
+                overlay.querySelector('.confirm-cancel').focus();
+            });
         }
 
         // Render one list's items into its container
@@ -1933,24 +2034,77 @@
 
         async function fetchRecord() {
             const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-                headers: { 'X-Master-Key': JSONBIN_API_KEY }
+                headers: { 'X-Master-Key': JSONBIN_API_KEY },
+                cache: 'no-store'
             });
             if (!res.ok) throw new Error('fetch failed');
             const json = await res.json();
-            return json.record || {};
+            return (json.record && typeof json.record === 'object') ? json.record : {};
         }
 
-        // Persist: the record IS the map of section-name → items. Flat and simple.
-        async function persist() {
-            await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+        async function putRecord(record) {
+            const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-Master-Key': JSONBIN_API_KEY
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify(record)
             });
+            if (!res.ok) throw new Error('put failed');
         }
+
+        // Save changed lists to the bin without clobbering anything else.
+        // Read-modify-write: pull the latest record, overlay ONLY the lists we
+        // changed locally, then write back. This means edits made on another
+        // device/tab to *other* tabs are never lost, and a failed load can never
+        // wipe the bin (we merge into the live record, not into an empty object).
+        async function flush() {
+            if (flushing) { flushAgain = true; return; }
+            if (!dirty.size) return;
+            flushing = true;
+            try {
+                const remote = await fetchRecord();          // latest server truth
+                const changed = Array.from(dirty);
+                changed.forEach(k => { remote[k] = data[k] || []; });
+                await putRecord(remote);
+                // Adopt the merged record so untouched tabs reflect the server too.
+                data = remote;
+                dirty.clear();
+                cacheLocal();
+                // Don't repaint over an inline edit the user has open right now.
+                if (!document.querySelector('.extras-item.editing')) renderAll();
+            } catch (e) {
+                // Network/API failure: keep the change queued in localStorage and
+                // retry later (on reconnect, tab focus, or the next edit).
+                console.log('List save deferred (will retry):', e);
+                cacheLocal();
+                scheduleRetry();
+            } finally {
+                flushing = false;
+                if (flushAgain) { flushAgain = false; flush(); }
+            }
+        }
+
+        // Mark a list changed, mirror locally at once, and kick off a save.
+        function mutate(key) {
+            dirty.add(key);
+            cacheLocal();          // durable immediately, even if the network is down
+            renderTotals();
+            flush();
+        }
+
+        let retryTimer = null;
+        function scheduleRetry() {
+            if (retryTimer) return;
+            retryTimer = setTimeout(() => { retryTimer = null; if (dirty.size) flush(); }, 15000);
+        }
+        // Retry pending saves when we regain connectivity or the app regains focus
+        // (e.g. reopening the PWA after it was backgrounded).
+        window.addEventListener('online', () => { if (dirty.size) flush(); });
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && dirty.size) flush();
+        });
 
         // For from/to lists (flights) build the display name as "מוצא → יעד"
         function normalizeItem(it) {
@@ -1976,14 +2130,9 @@
                 if (!data[key]) data[key] = [];
                 data[key].push(item);
                 renderList(key);
-                renderTotals();
                 fieldInputs.forEach(inp => inp.value = '');
                 fieldInputs[0].focus();
-
-                btn.disabled = true;
-                try { await persist(); }
-                catch (e) { console.log('List save error:', e); }
-                btn.disabled = false;
+                mutate(key);
             }
 
             btn.addEventListener('click', add);
@@ -1992,11 +2141,9 @@
             });
         });
 
-        async function saveAndRerender(key) {
+        function saveAndRerender(key) {
             renderList(key);
-            renderTotals();
-            try { await persist(); }
-            catch (err) { console.log('List save error:', err); }
+            mutate(key);
         }
 
         // Click handler (delete / edit / save-edit / cancel-edit) per list container
@@ -2006,9 +2153,12 @@
                 const del = e.target.closest('.item-del');
                 if (del) {
                     const idx = Number(del.dataset.index);
-                    if (!data[key]) return;
+                    if (!data[key] || !data[key][idx]) return;
+                    const name = data[key][idx].name || 'הפריט';
+                    const ok = await confirmDialog(`למחוק את "${name}"?`);
+                    if (!ok) return;
                     data[key].splice(idx, 1);
-                    await saveAndRerender(key);
+                    saveAndRerender(key);
                     return;
                 }
                 const edit = e.target.closest('.item-edit');
@@ -2112,16 +2262,29 @@
         async function load() {
             try {
                 const record = await fetchRecord();
-                data = record || {};
+                // Keep any locally-made edits that haven't synced yet (dirty keys)
+                // and let the server be the source of truth for everything else.
+                Object.keys(record).forEach(k => {
+                    if (!dirty.has(k)) data[k] = record[k];
+                });
+                // Drop tabs the server no longer has, unless we have pending edits there.
+                Object.keys(data).forEach(k => {
+                    if (!(k in record) && !dirty.has(k)) delete data[k];
+                });
+                cacheLocal();
             } catch (e) {
-                console.log('List load error:', e);
-                data = {};
+                console.log('List load error (using local copy):', e);
             }
             renderAll();
+            if (dirty.size) flush();   // push edits queued while offline
         }
 
-        renderAll();  // paint empty hints immediately
-        load();       // then hydrate from the shared bin
+        // Seed instantly from the offline mirror so content shows up even before
+        // (or without) the network — then hydrate/merge from the shared bin.
+        const cached = readCache();
+        if (cached) data = cached;
+        renderAll();
+        load();
     })();
 
     // Currency quick-convert — live rates (units per 1 USD) from exchangerate-api.com's
