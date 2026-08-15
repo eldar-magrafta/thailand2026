@@ -937,29 +937,32 @@
         .add-btn:active{ transform:translateY(0); }
         .add-btn:disabled{ opacity:.55; cursor:default; transform:none; box-shadow:none; }
         /* ghost delete button — reveals red intent on hover */
+        /* small "remove" badge floating on the card's top-left corner */
         .item-del{
-            width:28px;
-            height:28px;
-            flex-shrink:0;
-            border-radius:10px;
-            border:1px solid transparent;
-            background:transparent;
+            position:absolute;
+            top:-7px;
+            left:-7px;
+            width:20px;
+            height:20px;
+            padding:0;
+            border-radius:50%;
+            border:1.5px solid var(--paper);
+            background:var(--terracotta);
+            color:#fff;
             display:flex;
             align-items:center;
             justify-content:center;
             cursor:pointer;
-            font-size:.85rem;
+            font-size:.72rem;
+            font-weight:700;
             line-height:1;
-            opacity:.45;
-            filter:grayscale(1);
-            transition:all .18s ease;
+            box-shadow:0 2px 5px -1px rgba(0,0,0,.4);
+            z-index:4;
+            transition:transform .15s ease, background .15s ease;
         }
         .item-del:hover{
-            opacity:1;
-            filter:none;
-            background:rgba(165,25,49,.1);
-            border-color:var(--terracotta);
-            transform:scale(1.05);
+            background:var(--terracotta-deep);
+            transform:scale(1.15);
         }
         .empty-hint{
             display:flex;
@@ -2062,6 +2065,7 @@
                     : '';
                 return `
                 <div class="extras-item${item.done ? ' done' : ''}" draggable="true" data-list="${key}" data-index="${i}">
+                    <button type="button" class="item-del" data-list="${key}" data-index="${i}" title="מחיקה" aria-label="מחיקה">✕</button>
                     ${checkHtml}
                     <div class="item-drag" title="גררו לשינוי סדר" aria-label="גרירה">⠿</div>
                     <div class="extras-body">
@@ -2070,7 +2074,6 @@
                             <div class="extras-actions">
                                 ${priceHtml}
                                 <button type="button" class="item-edit" data-list="${key}" data-index="${i}" title="עריכה" aria-label="עריכה">✏️</button>
-                                <button type="button" class="item-del" data-list="${key}" data-index="${i}" title="מחיקה" aria-label="מחיקה">🗑️</button>
                             </div>
                         </div>
                         ${noteHtml}
