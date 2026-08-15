@@ -554,7 +554,10 @@
             transition:opacity .15s ease;
         }
         .plan-info a.maplink.lat{ direction:ltr; unicode-bidi:isolate; }
-        .plan-info a.maplink:hover, .plan-info a.maplink:active{ opacity:.7; }
+        .plan-info a.maplink:active{ opacity:.7; }
+        @media (hover:hover){
+            .plan-info a.maplink:hover{ opacity:.7; }
+        }
         .plan-info a.maplink::after{
             content:"📍"; font-size:.7em; margin-inline-start:.25em; opacity:.85;
         }
@@ -573,7 +576,9 @@
             transition:all .18s ease;
             text-decoration:none;
         }
-        .icon-btn:hover{ background:var(--lemon); border-color:var(--lemon); transform:translateY(-1px); }
+        @media (hover:hover){
+            .icon-btn:hover{ background:var(--lemon); border-color:var(--lemon); transform:translateY(-1px); }
+        }
         .icon-btn svg{ width:17px; height:17px; color:var(--ink); }
         /* itinerary day heading */
         .plan-day{
@@ -663,9 +668,11 @@
             border:1px solid var(--line);
         }
         .confirm-yes{ background:var(--terracotta); color:#fff; border-color:var(--terracotta-deep); }
-        .confirm-yes:hover{ background:var(--terracotta-deep); }
         .confirm-cancel{ background:var(--paper-deep); color:var(--ink); }
-        .confirm-cancel:hover{ background:#e4d5b3; }
+        @media (hover:hover){
+            .confirm-yes:hover{ background:var(--terracotta-deep); }
+            .confirm-cancel:hover{ background:#e4d5b3; }
+        }
 
         /* ---------- pull-to-refresh ---------- */
         .ptr{
@@ -709,13 +716,15 @@
             transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
             animation:itemIn .28s ease both;
         }
-        .extras-item:hover{
-            transform:translateY(-2px);
-            box-shadow:0 14px 30px -16px rgba(43,36,32,.45),
-                       inset 0 1px 0 rgba(255,255,255,0.45);
-            border-color:var(--terracotta);
+        @media (hover:hover){
+            .extras-item:hover{
+                transform:translateY(-2px);
+                box-shadow:0 14px 30px -16px rgba(43,36,32,.45),
+                           inset 0 1px 0 rgba(255,255,255,0.45);
+                border-color:var(--terracotta);
+            }
+            .extras-item.editing:hover{ transform:none; }
         }
-        .extras-item.editing:hover{ transform:none; }
         @keyframes itemIn{
             from{ opacity:0; transform:translateY(6px); }
             to{ opacity:1; transform:translateY(0); }
@@ -795,12 +804,14 @@
             filter:grayscale(1);
             transition:all .18s ease;
         }
-        .item-edit:hover{
-            opacity:1;
-            filter:none;
-            background:rgba(45,42,74,.1);
-            border-color:var(--blue);
-            transform:scale(1.05);
+        @media (hover:hover){
+            .item-edit:hover{
+                opacity:1;
+                filter:none;
+                background:rgba(45,42,74,.1);
+                border-color:var(--blue);
+                transform:scale(1.05);
+            }
         }
         /* inline edit form (reuses add-form fields) */
         .edit-form{
@@ -823,9 +834,11 @@
             transition:all .18s ease;
         }
         .edit-save{ background:#4c8c4a; border-color:#4c8c4a; color:#fff; }
-        .edit-save:hover{ filter:brightness(1.1); }
         .edit-cancel{ background:var(--paper); color:var(--blue-deep); }
-        .edit-cancel:hover{ background:var(--paper-deep); }
+        @media (hover:hover){
+            .edit-save:hover{ filter:brightness(1.1); }
+            .edit-cancel:hover{ background:var(--paper-deep); }
+        }
         .extras-summary{
             margin:0 0 1.25rem;
             padding:1rem 1.15rem;
@@ -935,7 +948,9 @@
             box-shadow:0 4px 14px -6px rgba(125,18,38,.7);
             transition:transform .15s ease, box-shadow .15s ease, filter .15s ease;
         }
-        .add-btn:hover{ transform:translateY(-1px); filter:brightness(1.07); box-shadow:0 7px 18px -6px rgba(125,18,38,.75); }
+        @media (hover:hover){
+            .add-btn:hover{ transform:translateY(-1px); filter:brightness(1.07); box-shadow:0 7px 18px -6px rgba(125,18,38,.75); }
+        }
         .add-btn:active{ transform:translateY(0); }
         .add-btn:disabled{ opacity:.55; cursor:default; transform:none; box-shadow:none; }
         /* ghost delete button — reveals red intent on hover */
@@ -962,9 +977,11 @@
             z-index:4;
             transition:transform .15s ease, background .15s ease;
         }
-        .item-del:hover{
-            background:var(--terracotta-deep);
-            transform:scale(1.15);
+        @media (hover:hover){
+            .item-del:hover{
+                background:var(--terracotta-deep);
+                transform:scale(1.15);
+            }
         }
         .empty-hint{
             display:flex;
