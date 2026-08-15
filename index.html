@@ -718,6 +718,24 @@
         }
         .item-drag:hover{ opacity:.8; background:rgba(201,183,143,.18); }
         .item-drag:active{ cursor:grabbing; }
+        /* wishlist "got it" checkbox (sits on the right in RTL) */
+        .item-check{
+            flex-shrink:0;
+            align-self:center;
+            width:20px;
+            height:20px;
+            margin:0;
+            cursor:pointer;
+            accent-color:var(--cypress);
+        }
+        /* checked → strike through the whole card */
+        .extras-item.done{ opacity:.6; }
+        .extras-item.done .extras-name,
+        .extras-item.done .extras-desc{
+            text-decoration:line-through;
+            text-decoration-color:var(--terracotta);
+            text-decoration-thickness:2px;
+        }
         .extras-body{ flex:1; min-width:0; display:flex; flex-direction:column; gap:.5rem; }
         /* while dragging */
         .extras-item.dragging{
@@ -1965,8 +1983,14 @@
                 const noteHtml = item.note
                     ? `<div class="extras-desc">${esc(item.note)}</div>`
                     : '';
+                // Wishlist items get a "got it" checkbox on the right; when checked
+                // the card is struck through. The done state is saved like any field.
+                const checkHtml = key === 'wishlist'
+                    ? `<input type="checkbox" class="item-check" data-list="${key}" data-index="${i}"${item.done ? ' checked' : ''} title="סמן כבוצע" aria-label="סמן כבוצע">`
+                    : '';
                 return `
-                <div class="extras-item" draggable="true" data-list="${key}" data-index="${i}">
+                <div class="extras-item${item.done ? ' done' : ''}" draggable="true" data-list="${key}" data-index="${i}">
+                    ${checkHtml}
                     <div class="item-drag" title="גררו לשינוי סדר" aria-label="גרירה">⠿</div>
                     <div class="extras-body">
                         <div class="extras-header">
@@ -2186,6 +2210,18 @@
                     renderList(key);   // discard changes, repaint from model
                     return;
                 }
+            });
+
+            // Toggle the wishlist "done" checkbox → strike through + persist
+            container.addEventListener('change', e => {
+                const box = e.target.closest('.item-check');
+                if (!box) return;
+                const idx = Number(box.dataset.index);
+                if (!data[key] || !data[key][idx]) return;
+                data[key][idx].done = box.checked;
+                const itemEl = box.closest('.extras-item');
+                if (itemEl) itemEl.classList.toggle('done', box.checked);
+                mutate(key);   // save without a full repaint
             });
 
             // Enter saves an inline edit, Escape cancels
