@@ -1,7 +1,7 @@
 /* Service worker for the תאילנד 2026 trip page.
    Goal: full offline use on spotty signal, installable to home screen. */
 
-const VERSION = 'thailand-trip-v8';
+const VERSION = 'thailand-trip-v9';
 const PRECACHE = VERSION + '-precache';
 const RUNTIME = VERSION + '-runtime';
 
